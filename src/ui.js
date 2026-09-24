@@ -256,7 +256,7 @@
 
     /* Sub-view header (detail / info) */
     .subhd { display: flex; align-items: center; gap: 8px; padding: 4px 8px; min-height: 36px; border-bottom: 1px solid var(--line); background: var(--surface); }
-    .back { display: inline-flex; align-items: center; gap: 2px; height: 26px; padding: 0 8px 0 4px; border: 0; border-radius: var(--r-sm);
+    .back { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 8px 0 6px; white-space: nowrap; border: 0; border-radius: var(--r-sm);
             background: transparent; color: var(--muted); font-size: var(--fs-label); font-weight: 500; cursor: pointer; transition: background var(--t), color var(--t); }
     .back:hover { background: var(--bg); color: var(--ink); }
 
@@ -320,7 +320,7 @@
     .ab-hero-txt { flex: 1; min-width: 0; }
     .ab-art { flex: none; margin-top: -6px; }
     .ab-ver { display: inline-block; background: var(--accent-soft); color: var(--accent); font-size: var(--fs-micro);
-            font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: .2px; margin-bottom: 7px; }
+            font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: .2px; margin-top: 7px; }
     .ab-hero h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -.35px; line-height: 1.25; color: var(--ink); }
     .ab-hero h2 span { color: #5b2fd6; }
     .ab-desc { margin: 7px 0 0; font-size: var(--fs-label); line-height: 1.55; color: var(--ink-2); }
@@ -756,7 +756,7 @@
       (sel || input).focus({ preventScroll: true });
     }
     function backBar(label, onBack, extra) {
-      const b = el('button', { className: 'back', type: 'button' }, svg('chevron-left', 15, 2), label);
+      const b = el('button', { className: 'back', type: 'button', title: label + ' (Esc)' }, svg('arrow-left', 14, 2), label);
       b.onclick = onBack;
       subhd.replaceChildren(b, extra || '');
     }
@@ -956,7 +956,7 @@
     // ---- detail view ----
     function renderDetail(it) {
       setChrome('detail');
-      backBar('Results', showList);
+      backBar('Back to search', showList);
 
       // Location: each folder is a chip; the page itself is highlighted at the end
       const parts = [...it.path, it.name];
@@ -1030,14 +1030,14 @@
       };
       const back = () => {
         if (cameFrom) {
-          setChrome('detail'); backBar('Results', showList); body.replaceChildren(cameFrom.node); footer.replaceChildren(...cameFrom.footer);
+          setChrome('detail'); backBar('Back to search', showList); body.replaceChildren(cameFrom.node); footer.replaceChildren(...cameFrom.footer);
           (footer.querySelector('.primary') || subhd.querySelector('.back')).focus({ preventScroll: true });
         }
         else showList();
       };
       function draw() {
         tabs.replaceChildren(mkTab('about', 'About'), mkTab('keys', 'Shortcuts'));
-        backBar(cameFrom ? 'Page' : 'Results', back, tabs);
+        backBar(cameFrom ? 'Back to page' : 'Back to search', back, tabs);
         body.replaceChildren(tab === 'about' ? aboutPane() : keysPane());
         body.scrollTop = 0;
         // Developer details are pinned to the footer on the About tab, never scrolled away.
@@ -1071,8 +1071,8 @@
         el('div', { className: 'ab-hero' },
           el('div', { className: 'ab-hero-top' },
             el('div', { className: 'ab-hero-txt' },
-              el('span', { className: 'ab-ver', textContent: 'v' + meta.version }),
-              el('h2', {}, 'Search. Navigate. Open. ', el('span', { textContent: 'Instantly.' }))),
+              el('h2', {}, 'Search. Navigate. Open. ', el('span', { textContent: 'Instantly.' })),
+              el('span', { className: 'ab-ver', textContent: 'v' + meta.version })),
             el('div', { className: 'ab-art' }, rawSvg(HERO_ART))),
           el('p', { className: 'ab-desc', textContent: ABOUT_TEXT })),
 
