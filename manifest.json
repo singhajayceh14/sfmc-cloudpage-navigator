@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "CloudPage Navigator",
+  "version": "1.15.0",
+  "minimum_chrome_version": "88",
+  "description": "Search and navigate Salesforce Marketing Cloud CloudPages by name, URL, URL key or folder. Read-only; uses your existing session.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.exacttarget.com/cloud/*"
+      ],
+      "js": [
+        "src/core.js",
+        "src/api.js",
+        "src/icons.js",
+        "src/ui.js",
+        "src/main.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/icon48.png"
+      ],
+      "matches": [
+        "https://*.exacttarget.com/*"
+      ]
+    }
+  ],
+  "author": {
+    "email": "singh.ajayceh14@gmail.com"
+  },
+  "homepage_url": "https://www.linkedin.com/in/ajay-singh-mbm/",
+  "permissions": [
+    "storage"
+  ]
+}

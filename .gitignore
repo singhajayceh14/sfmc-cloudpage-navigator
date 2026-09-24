@@ -1,0 +1,4 @@
+# Build output (scripts/package.ps1)
+dist/
+# Local knowledge graph (graphify)
+graphify-out/
