@@ -547,7 +547,7 @@
     const progress = el('div', { className: 'progress', attrs: { role: 'progressbar', 'aria-label': 'Loading CloudPages', 'aria-valuemin': 0, 'aria-valuemax': 100 } }, bar);
 
     // Toolbar: search + filter chips
-    const input = el('input', { type: 'search', placeholder: 'Search by name, URL, folder…', spellcheck: false, autocomplete: 'off',
+    const input = el('input', { type: 'search', placeholder: 'Search name, url or folder…', spellcheck: false, autocomplete: 'off',
       attrs: { 'aria-label': 'Search CloudPages', 'aria-controls': 'cpn-results' } });
     const clearBtn = el('button', { className: 'clear', type: 'button', hidden: true, attrs: { 'aria-label': 'Clear search' } }, svg('x', 13, 2));
     const kbdHint = el('kbd', { textContent: `${MOD} K`, attrs: { 'aria-hidden': 'true' } });
