@@ -1,6 +1,6 @@
-// Pure logic: no network, no DOM. Unit-tested in tests/core.test.js.
+// Pure data logic: no network or DOM access.
 (function (root) {
-  // Maps each CloudPages endpoint to the fields we need. Only this table knows the raw shapes.
+  // Per-endpoint config used to normalise raw API records.
   const SOURCES = {
     'landing-pages':  { type: 'Landing Page',  channel: 'landingpage',   idField: 'landingPageId' },
     'code-resources': { type: 'Code Resource', channel: 'code-resource', idField: 'codeResourceId' },
@@ -61,10 +61,10 @@
     });
   }
 
-  // Builds the "who am I / where am I" model shown in the header popover.
-  // `token`  = platform/v1/tokenContext  -> the ids, always trustworthy.
-  // `shell`  = names scraped from Marketing Cloud's own header  -> may be missing if Salesforce
-  //            restyles that header, so every name falls back to null and the UI shows the id alone.
+  // Account model for the header popover.
+  // `token`: ids from platform/v1/tokenContext (reliable).
+  // `shell`: names scraped from the MC header. Any name may be null if the markup changes;
+  //          the UI then shows the id only.
   function identityModel(token, shell) {
     const t = token || {}, sh = shell || {};
     const mid = t.organization && t.organization.id != null ? String(t.organization.id) : null;
@@ -80,7 +80,7 @@
   }
 
   // Stable identity for one record. Ids repeat across sources, so the channel is part of the key.
-  // Used for selection, and as the key pinned favourites are stored under.
+  // Also used as the storage key for pins.
   const keyOf = it => it.channel + ':' + it.id;
 
   // Pinned rows float to the top, keeping the current sort order inside each group.
@@ -102,8 +102,8 @@
     return Number.isNaN(t) ? null : t;
   }
 
-  // Stable order. Used every time a chunk arrives, so it must be cheap and total.
-  // Every mode falls back to the folder key, so equal rows never shuffle between chunks.
+  // Runs on every chunk, so keep it cheap. All modes tie-break on folder path so rows
+  // don't reorder as chunks arrive.
   function sortItems(items, mode) {
     const folderKey = i => (i.path.join('/') + '/' + i.name).toLowerCase();
     const byFolder = (a, b) => folderKey(a).localeCompare(folderKey(b));
@@ -127,14 +127,13 @@
     return !pinned || !pinned.size ? 0 : items.reduce((n, it) => n + (pinned.has(keyOf(it)) ? 1 : 0), 0);
   }
 
-  // The chip row is one exclusive selector over two different axes: publication status, and
-  // "is it a favourite". filterStatus stays a pure status filter; this picks which axis applies.
+  // The chip row covers two filters (status and pinned); this picks which one applies.
   function filterView(items, view, pinned) {
     if (view === 'pinned') return !pinned || !pinned.size ? [] : items.filter(it => pinned.has(keyOf(it)));
     return filterStatus(items, view);
   }
 
-  // Status chips: applied AFTER search, so search logic is untouched. 'all' passes everything through.
+  // Status filter, applied after search. 'all' is a no-op.
   function filterStatus(items, status) {
     return !status || status === 'all' ? items : items.filter(i => i.status === status);
   }

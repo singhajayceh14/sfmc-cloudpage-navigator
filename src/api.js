@@ -1,13 +1,30 @@
-// The ONLY file that talks to SFMC. Internal, undocumented endpoints: if SFMC changes them, fix here.
+// Only module that calls SFMC. The endpoints are internal and undocumented; keep changes here.
 (function (root) {
   const BASE = '/cloud/fuelapi';
   const MAX_PAGES = 200; // safety stop: 200 x 50 = 10,000 items
 
+  const TIMEOUT_MS = 20000; // abort stalled requests
+
+  // Errors carry a `kind` for the UI: 'offline', 'network' (unreachable or timed out),
+  // 'auth' (session expired) or 'server'.
+  function fail(kind, message) { const e = new Error(message); e.kind = kind; return e; }
+
   async function getJson(path) {
-    const res = await fetch(BASE + path, { headers: { accept: 'application/json' } }); // same-origin: session sent by default
-    if (res.status === 401 || res.status === 403) throw new Error('Not logged in to Marketing Cloud (HTTP ' + res.status + ')');
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
-    return res.json();
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    let res;
+    try {
+      res = await fetch(BASE + path, { headers: { accept: 'application/json' }, signal: ctrl.signal }); // same-origin: session sent by default
+    } catch (e) {
+      if (!navigator.onLine) throw fail('offline', 'No internet connection');
+      throw fail('network', e.name === 'AbortError'
+        ? `Marketing Cloud did not answer within ${TIMEOUT_MS / 1000}s`
+        : `Could not reach Marketing Cloud (${e.message})`);
+    } finally { clearTimeout(timer); }
+    if (res.status === 401 || res.status === 403) throw fail('auth', 'Not logged in to Marketing Cloud (HTTP ' + res.status + ')');
+    if (!res.ok) throw fail('server', `HTTP ${res.status} for ${path}`);
+    try { return await res.json(); }
+    catch { throw fail('server', `Unexpected response for ${path}`); }
   }
 
   // Endpoint returns max 50 per page and paginates with "$page" (plain "page" is silently ignored).
@@ -21,7 +38,11 @@
       const results = await Promise.all(queue.map(id =>
         getJson(`/asset/v1/content/categories/${id}`)
           .then(c => [id, { name: c.name, parentId: c.parentId }])
-          .catch(() => [id, { name: `(folder ${id})`, parentId: 0 }])   // keep going; show id instead
+          .catch(e => {
+            // Don't cache placeholder names while offline; abort the load instead.
+            if (e.kind === 'offline' || e.kind === 'network') throw e;
+            return [id, { name: `(folder ${id})`, parentId: 0 }];   // fall back to the id for this folder
+          })
       ));
       results.forEach(([id, c]) => catCache.set(id, c));
       queue = [...new Set(results.map(([, c]) => c.parentId))].filter(id => id && !catCache.has(id));
@@ -31,7 +52,7 @@
 
   // Progressive loading. Page 1 of every type is fetched in parallel (fast first results + grand total),
   // then remaining pages one at a time. Each chunk arrives complete with folder paths.
-  // onChunk(items, { loaded, total }) · isCancelled() lets a newer Refresh stop an older run.
+  // onChunk(items, { loaded, total }). isCancelled() lets a newer refresh abort this run.
   async function loadInChunks(onChunk, isCancelled = () => false) {
     const { SOURCES, normalize, buildPath } = root.CPF.core;
     const sources = Object.keys(SOURCES);
@@ -39,7 +60,7 @@
     catCache.clear();   // Refresh re-reads folders too, so renamed/moved folders show their new paths
 
     async function emit(source, raws) {
-      // One malformed record must not sink the whole load: skip it and keep going.
+      // Skip malformed records rather than failing the whole load.
       const items = raws.flatMap(r => {
         try { return [normalize(source, r)]; }
         catch (e) { console.warn('[CloudPage Navigator] skipped record:', e.message); return []; }
@@ -69,9 +90,8 @@
   }
 
   // ---- who is signed in, and which business unit ----
-  // Two sources on purpose: the ids come from the API (stable contract), the names from Marketing
-  // Cloud's own header markup (no endpoint exposes them). If Salesforce restyles that header the
-  // names simply come back null and the popover shows the ids.
+  // Ids come from the API. Names are scraped from the MC header because no endpoint exposes
+  // them; if the markup changes they come back null and the popover shows ids only.
   function readShell() {
     const text = sel => { const n = document.querySelector(sel); return n ? n.textContent.trim() : null; };
     // Each row of the account switcher carries a name and a MID. Climb from the name to the first
