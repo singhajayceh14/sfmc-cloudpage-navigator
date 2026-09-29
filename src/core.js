@@ -51,12 +51,12 @@
     return names;
   }
 
-  // Every search word must appear in name, URL, or path (case-insensitive).
+  // Every search word must appear in name, URL, URL key or path (case-insensitive).
   function search(items, query) {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) return items;
     return items.filter(it => {
-      const hay = (it.name + ' ' + it.url + ' ' + it.path.join(' / ')).toLowerCase();
+      const hay = (it.name + ' ' + it.url + ' ' + it.key + ' ' + it.path.join(' / ')).toLowerCase();
       return words.every(w => hay.includes(w));
     });
   }

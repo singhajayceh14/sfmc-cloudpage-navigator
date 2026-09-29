@@ -246,11 +246,9 @@
     .pager { display: flex; align-items: center; gap: 2px; }
     .lfoot-l { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 24px; }
     .lfoot-l > span + span { padding-left: 10px; border-left: 1px solid var(--line-strong); }
-    .conn { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; flex: none; cursor: default; }
-    .conn-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--ok);
-                box-shadow: 0 0 0 3px var(--ok-soft); }
-    .conn.bad .conn-dot { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); animation: pulse 1.4s ease-in-out infinite; }
-    @media (prefers-reduced-motion: reduce) { .conn.bad .conn-dot { animation: none; } }
+    .conn { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; flex: none; cursor: default; color: var(--ok-ink); }
+    .conn.bad { color: var(--danger); animation: pulse 1.4s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .conn.bad { animation: none; } }
     .pg { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-sm);
           border: 1px solid transparent; background: transparent; color: var(--muted); font-size: var(--fs-meta); font-weight: 600;
           cursor: pointer; font-variant-numeric: tabular-nums; transition: background var(--t), color var(--t), border-color var(--t); }
@@ -410,7 +408,7 @@
   // About screen copy lives here so wording can change without touching layout code.
   // Contact details (email, profile link) come from manifest.json: author.email and homepage_url.
   const DEVELOPER = 'Ajay Singh';
-  const ABOUT_TEXT = 'CloudPages pile up fast across folders and business units. ' +
+  const ABOUT_TEXT = 'CloudPages pile up fast across folders. ' +
     'Navigator finds the one you need in seconds and takes you straight to it.';
   // icon, ink, tint, title, one line. Tints are pale enough that the ink stays >= 4.5:1 on them.
   const FEATURES = [
@@ -419,7 +417,7 @@
     ['file-text', '#1d7a4a', '#eaf6ef', 'Page Details',     'View key details at a glance'],
     ['link',      '#9a5b0c', '#fdf1e3', 'Copy URL',         'Copy published URL with one click'],
     ['compass',   '#0b5cab', '#e7effa', 'Quick Navigation', 'Open in Marketing Cloud directly'],
-    ['users',     '#6d28d9', '#f1ebfd', 'Large Accounts',   'Optimized for large workspaces'],
+    ['layers',    '#6d28d9', '#f1ebfd', 'Big Accounts',     'Loads thousands of pages progressively'],
   ];
   // Hero artwork. Multi-colour, so it cannot come from the single-stroke icon set; parsed as its own
   // SVG document and imported as nodes, never injected as HTML.
@@ -562,7 +560,7 @@
     }
 
     // Header
-    const whoBtn = iconButton('user', 'Signed in as / business unit', () => toggleWho());
+    const whoBtn = iconButton('user', 'Account & business unit', () => toggleWho());
     const refreshBtn = iconButton('refresh-cw', 'Refresh', () => onRefresh());
     const infoBtn = iconButton('info', 'About & shortcuts', () => (view === 'info' ? showList() : renderInfo('about')));
     const closeBtn = iconButton('x', 'Close (Esc)', () => toggle(false));
@@ -581,7 +579,7 @@
     const progress = el('div', { className: 'progress', attrs: { role: 'progressbar', 'aria-label': 'Loading CloudPages', 'aria-valuemin': 0, 'aria-valuemax': 100 } }, bar);
 
     // Toolbar: search + filter chips
-    const input = el('input', { type: 'search', placeholder: 'Search name, url or folder…', spellcheck: false, autocomplete: 'off',
+    const input = el('input', { type: 'search', placeholder: 'Search name, URL, key or folder…', spellcheck: false, autocomplete: 'off',
       attrs: { 'aria-label': 'Search CloudPages', 'aria-controls': 'cpn-results' } });
     const clearBtn = el('button', { className: 'clear', type: 'button', hidden: true, attrs: { 'aria-label': 'Clear search' } }, svg('x', 13, 2));
     const kbdHint = el('kbd', { textContent: `${MOD} K`, attrs: { 'aria-hidden': 'true' } });
@@ -644,8 +642,8 @@
     const body = el('div', { className: 'body', id: 'cpn-results' });
     const range = el('span');
     const pager = el('nav', { className: 'pager', attrs: { 'aria-label': 'Pagination' } });
-    // Dot only; the text is in the tooltip and aria-label.
-    const conn = el('span', { className: 'conn', attrs: { role: 'status', 'aria-live': 'polite' } }, el('span', { className: 'conn-dot' }));
+    // Icon only; the text is in the tooltip and aria-label.
+    const conn = el('span', { className: 'conn', attrs: { role: 'status', 'aria-live': 'polite' } }, svg('wifi', 13, 2));
     const lfoot = el('div', { className: 'lfoot', hidden: true }, el('div', { className: 'lfoot-l' }, conn, range), pager);
     const subhd = el('div', { className: 'subhd', hidden: true });
     const footer = el('div', { className: 'footer', hidden: true });
@@ -829,7 +827,7 @@
         b.onclick = () => onFilter(key); return b;
       };
       chips.replaceChildren(chip('all', 'All'), chip('Published', 'Published', 'pub'), chip('Draft', 'Draft', 'draft'),
-        chip('pinned', 'Pinned', null, 'star'));
+        chip('pinned', 'Pinned', null, 'pin'));
     }
 
     // ---- row actions (copy / open live / pin) ----
@@ -929,7 +927,7 @@
         const box = state.loading
           ? stateBox({ iconName: 'search', title: 'No matches yet', text: `Still loading — ${state.loaded} of ${state.total} checked.` })
           : state.status === 'pinned' && !state.query
-            ? stateBox({ iconName: 'star', title: 'Nothing pinned yet',
+            ? stateBox({ iconName: 'pin', title: 'Nothing pinned yet',
                          text: 'Hover any result and use the pin button to keep it here.' })
             : stateBox({ iconName: 'search-x', title: 'No CloudPages found', text: 'Try searching by name, URL, folder or URL key.', action: clear });
         body.replaceChildren(box);
@@ -969,7 +967,7 @@
         };
         if (!anyPinned) return row;
         const head = isPinned(it)
-          ? (openedPinned ? null : (openedPinned = true, groupHeader('star', 'Pinned', state.pinnedCount)))
+          ? (openedPinned ? null : (openedPinned = true, groupHeader('pin', 'Pinned', state.pinnedCount)))
           : (openedRest ? null : (openedRest = true, groupHeader(null, 'All CloudPages')));
         return head ? [head, row] : row;
       }));
@@ -986,6 +984,7 @@
         ? 'Offline'
         : (state.error || state.warning) && errorKind(state) === 'network' ? 'Connection problem' : '';
       conn.classList.toggle('bad', !!down);
+      conn.replaceChildren(svg(down === 'Offline' ? 'wifi-off' : down ? 'cloud-off' : 'wifi', 13, 2));
       conn.title = down ? (down === 'Offline' ? 'Offline: no internet connection' : 'Connection problem: Marketing Cloud is not responding')
                         : 'Online: connected to Marketing Cloud';
       conn.setAttribute('aria-label', conn.title);
@@ -1066,7 +1065,7 @@
           el('div', { className: 'hero-txt' }, el('h2', { textContent: it.name }),
             el('div', { className: 'tags' }, statusBadge(it.status), el('span', { className: 'tag', textContent: typeLabel(it) })))),
         card('folder-open', 'Location', el('div', { className: 'crumbs' }, crumbs)),
-        card('link', 'Published URL', el('div', { className: 'urlbox' }, el('code', { textContent: it.url || 'No URL' }), copyBtn(it.url, 'Copy URL'), liveBtn)),
+        card('link', pub ? 'Published URL' : 'URL', el('div', { className: 'urlbox' }, el('code', { textContent: it.url || 'No URL' }), copyBtn(it.url, 'Copy URL'), liveBtn)),
         // Status and type are shown in the hero tags.
         el('dl', { className: 'tiles' },
           dateTile('calendar-plus', 'slate', 'Created', it.createdDate),
