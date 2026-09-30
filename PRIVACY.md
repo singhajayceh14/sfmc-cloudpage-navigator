@@ -1,6 +1,6 @@
 # CloudPage Navigator — Privacy Policy
 
-_Effective: 24 September 2026_
+_Effective: 30 September 2026_
 
 CloudPage Navigator is a browser extension that helps you search and open CloudPages in
 Salesforce Marketing Cloud. It is an independent tool and is not affiliated with or endorsed by
@@ -36,6 +36,7 @@ Using the browser's local extension storage (`chrome.storage.local`), on your de
 
 - the vertical position of the panel and its launcher tab
 - the list of CloudPages you pinned (stored as an internal type and ID, such as `landingpage:12345`)
+- your colour theme choice (light, dark or system)
 
 You can remove this data at any time by uninstalling the extension.
 

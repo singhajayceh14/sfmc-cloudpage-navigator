@@ -34,7 +34,7 @@ Upload `dist/ab-cloudpage-navigator-<version>.zip`. Every later update needs a h
 ```
 Find any CloudPage in seconds.
 
-CloudPages pile up fast across folders and business units. CloudPage Navigator adds a search panel to Salesforce Marketing Cloud so you can find the page you need and jump straight to it, without clicking through folder trees.
+CloudPages pile up fast across folders. CloudPage Navigator adds a search panel to Salesforce Marketing Cloud so you can find the page you need and jump straight to it, without clicking through folder trees.
 
 KEY FEATURES
 • Instant search by name, URL, URL key or folder path
@@ -47,6 +47,7 @@ KEY FEATURES
 • Shows which user, business unit (MID) and enterprise you are signed in to
 • Keyboard first: Ctrl+K (⌘K on Mac) opens it anywhere in Marketing Cloud; arrows, Enter and Esc to navigate
 • Built for large accounts: results stream in progressively
+• Light, dark or system theme
 
 PRIVATE AND READ-ONLY
 • Works only on Marketing Cloud pages (*.exacttarget.com/cloud/*)
@@ -56,7 +57,7 @@ PRIVATE AND READ-ONLY
 
 HOW TO USE
 1. Sign in to Marketing Cloud.
-2. Click the "CloudPages" tab on the right edge of the screen, or press Ctrl+K.
+2. Click the blue tab on the right edge of the screen, or press Ctrl+K.
 3. Start typing.
 
 This is an independent tool. It is not affiliated with, endorsed by or sponsored by Salesforce, Inc. Salesforce and Marketing Cloud are trademarks of Salesforce, Inc.
@@ -89,7 +90,7 @@ A demo or sandbox business unit with sample pages is the easiest option.
 > Lets Salesforce Marketing Cloud users search their CloudPages (landing pages, code resources, microsites) by name, URL, URL key or folder and open them directly.
 
 **Permission justification: `storage`:**
-> Saves the user's preferences locally on the device: the vertical position of the panel and the list of CloudPages the user pinned as favourites. Nothing is synced or sent anywhere.
+> Saves the user's preferences locally on the device: the vertical position of the panel, the list of CloudPages the user pinned as favourites, and the chosen colour theme. Nothing is synced or sent anywhere.
 
 **Host permission justification (content script on `https://*.exacttarget.com/cloud/*`):**
 > The extension's only purpose is to add a search panel inside Salesforce Marketing Cloud. The content script runs only on Marketing Cloud pages. It calls Marketing Cloud's own endpoints on the same site, using the user's existing session, to read the list of CloudPages and their folder names. The script is read-only and never modifies data.

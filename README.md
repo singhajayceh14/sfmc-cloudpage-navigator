@@ -14,6 +14,7 @@ See [PRIVACY.md](PRIVACY.md).
 - Copy the published URL, open the live page, or open it in CloudPages in one click
 - Shows the signed-in user, business unit (MID) and enterprise
 - Keyboard first: <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>⌘</kbd><kbd>K</kbd> on Mac) anywhere in Marketing Cloud
+- Light, dark or system theme
 
 ## Install for development
 
