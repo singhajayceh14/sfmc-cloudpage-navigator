@@ -21,7 +21,7 @@ Copy and paste these answers into the Developer Dashboard (https://chrome.google
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/package.ps1
 ```
-Upload `dist/cloudpage-navigator-<version>.zip`. Every later update needs a higher `version` in `manifest.json`.
+Upload `dist/ab-cloudpage-navigator-<version>.zip`. Every later update needs a higher `version` in `manifest.json`.
 
 ## 2. Store listing tab
 

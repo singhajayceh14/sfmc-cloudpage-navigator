@@ -41,7 +41,7 @@ After you change the code, reload the extension on `chrome://extensions` and ref
 # bump "version" in manifest.json first
 powershell -ExecutionPolicy Bypass -File scripts/package.ps1
 ```
-Then upload `dist/cloudpage-navigator-<version>.zip` in the Chrome Web Store Developer Dashboard.
+Then upload `dist/ab-cloudpage-navigator-<version>.zip` in the Chrome Web Store Developer Dashboard.
 See [store/LISTING.md](store/LISTING.md) for the steps.
 
 ## Author

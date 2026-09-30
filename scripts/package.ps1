@@ -1,4 +1,4 @@
-# Builds the Chrome Web Store upload: dist/cloudpage-navigator-<version>.zip
+# Builds the Chrome Web Store upload: dist/ab-cloudpage-navigator-<version>.zip
 # Only runtime files go in. Dev and store material (store/, scripts/, graphify-out/, .vscode/, *.md,
 # icon SVG sources) stays out.
 # Usage (from the repo root):  powershell -ExecutionPolicy Bypass -File scripts/package.ps1
@@ -15,7 +15,7 @@ $files = @('manifest.json') +
 # which the Web Store (a Linux unzip) does not treat as folders. Entry names here always use "/".
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 New-Item -ItemType Directory -Force dist | Out-Null
-$zip = Join-Path $root "dist/cloudpage-navigator-$version.zip"
+$zip = Join-Path $root "dist/ab-cloudpage-navigator-$version.zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
 $archive = [IO.Compression.ZipFile]::Open($zip, 'Create')
 try {
