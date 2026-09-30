@@ -5,6 +5,7 @@
   const PAGE_SIZE = 25;
   const POSITION_KEY = 'cpn.position';   // { panel, fab } vertical offsets chosen by dragging
   const PINS_KEY = 'cpn.pins';           // array of core.keyOf() strings, newest pin last
+  const THEME_KEY = 'cpn.theme';         // 'light' | 'dark' | 'system'
   // Without chrome.storage the UI still works, just without persistence.
   const store = {
     area: root.chrome && chrome.storage && chrome.storage.local,
@@ -50,11 +51,13 @@
     // Deep link into the CloudPages app. The UI opens it in a new tab so the current search is kept.
     cloudPageUrl: it => core.editorLink(location.origin, it),
     onMove: position => store.set(POSITION_KEY, position),
+    onTheme: theme => store.set(THEME_KEY, theme),
     // Read once per session; the header popover asks for it the first time it is opened.
     onIdentity: () => api.getIdentity(),
   });
 
   store.get(POSITION_KEY).then(p => p && view.setPositions(p));
+  store.get(THEME_KEY).then(t => t && view.setTheme(t));
   store.get(PINS_KEY).then(keys => { if (Array.isArray(keys) && keys.length) { st.pinned = new Set(keys); paint(); } });
 
   // NOTE: the only place we change host page behaviour (navigation only, never data).

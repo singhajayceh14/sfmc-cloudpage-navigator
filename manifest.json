@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CloudPage Navigator",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "minimum_chrome_version": "88",
   "description": "Search and navigate Salesforce Marketing Cloud CloudPages by name, URL, URL key or folder. Read-only; uses your existing session.",
   "content_scripts": [

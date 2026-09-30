@@ -21,7 +21,13 @@
       --ok: #2e9e63; --ok-ink: #1d7a4a; --ok-soft: #f2f8f4; --ok-line: #d9ece1;
       --warn: #e8a33d; --warn-ink: #9a5b0c; --warn-soft: #fdf5e8; --warn-line: #f3dfbd;
       --danger: #c0392b; --danger-soft: #fdf1ef; --danger-line: #f3d0cb;
-      --sel: #f1f7fe;
+      --sel: #f1f7fe; --on-accent: #fff; --tip-bg: #16243c; --tip-ink: #fff;
+      --hero-top: #f4f8fd; --hero-accent: #5b2fd6;
+      --t-blue: #0b5cab; --t-blue-bg: #e7effa; --t-purple: #6d28d9; --t-purple-bg: #f1ebfd;
+      --t-green: #1d7a4a; --t-green-bg: #eaf6ef; --t-amber: #9a5b0c; --t-amber-bg: #fdf1e3;
+      --hd-bg: linear-gradient(120deg, #0b5cab 0%, #3a4fd6 100%); --hd-ink: #fff; --hd-muted: rgba(255,255,255,.78);
+      --hd-sub: #b9dcff; --hd-hover: rgba(255,255,255,.16); --hd-on: rgba(255,255,255,.24);
+      color-scheme: light;
       --r: 8px; --r-sm: 6px;
       --fs-title: 15px; --fs-body: 12px; --fs-label: 11.5px; --fs-meta: 10px; --fs-micro: 9.5px;
       --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -31,6 +37,38 @@
       --t: 140ms ease;
       --panel-w: ${PANEL_W}px;
       --panel-h: ${PANEL_H}px;   /* fixed size: never shrinks with content or window */
+    }
+    :host([data-theme="dark"]) {
+      color-scheme: dark;
+      --bg: #151b26; --surface: #1b2230; --line: #2a3344; --line-strong: #364155;
+      --ink: #e6ebf3; --ink-2: #cdd5e1; --muted: #9aa5b5; --faint: #6f7b8d;
+      --accent: #5ea1ff; --accent-hover: #7cb3ff; --accent-soft: #1e2d45; --accent-ring: rgba(94,161,255,.35); --on-accent: #0b1422;
+      --ok: #3fbf7f; --ok-ink: #5fd49a; --ok-soft: #16261e; --ok-line: #24402f;
+      --warn: #f0b24f; --warn-ink: #f3c173; --warn-soft: #2a2215; --warn-line: #4a3a1d;
+      --danger: #f0685a; --danger-soft: #2c1a19; --danger-line: #4d2723;
+      --sel: #1c2a40; --tip-bg: #e6ebf3; --tip-ink: #151b26;
+      --hero-top: #1a2436; --hero-accent: #b69cff;
+      --t-blue: #7cb3ff; --t-blue-bg: #1e2d45; --t-purple: #b69cff; --t-purple-bg: #2a2145;
+      --t-green: #5fd49a; --t-green-bg: #16261e; --t-amber: #f3c173; --t-amber-bg: #2a2215;
+      --shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06);
+      --hd-bg: linear-gradient(120deg, #123e73 0%, #2b2f7a 100%);
+    }
+    @media (prefers-color-scheme: dark) {
+      :host([data-theme="system"]) {
+        color-scheme: dark;
+        --bg: #151b26; --surface: #1b2230; --line: #2a3344; --line-strong: #364155;
+        --ink: #e6ebf3; --ink-2: #cdd5e1; --muted: #9aa5b5; --faint: #6f7b8d;
+        --accent: #5ea1ff; --accent-hover: #7cb3ff; --accent-soft: #1e2d45; --accent-ring: rgba(94,161,255,.35); --on-accent: #0b1422;
+        --ok: #3fbf7f; --ok-ink: #5fd49a; --ok-soft: #16261e; --ok-line: #24402f;
+        --warn: #f0b24f; --warn-ink: #f3c173; --warn-soft: #2a2215; --warn-line: #4a3a1d;
+        --danger: #f0685a; --danger-soft: #2c1a19; --danger-line: #4d2723;
+        --sel: #1c2a40; --tip-bg: #e6ebf3; --tip-ink: #151b26;
+        --hero-top: #1a2436; --hero-accent: #b69cff;
+        --t-blue: #7cb3ff; --t-blue-bg: #1e2d45; --t-purple: #b69cff; --t-purple-bg: #2a2145;
+        --t-green: #5fd49a; --t-green-bg: #16261e; --t-amber: #f3c173; --t-amber-bg: #2a2215;
+        --shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06);
+        --hd-bg: linear-gradient(120deg, #123e73 0%, #2b2f7a 100%);
+      }
     }
     * { box-sizing: border-box; font-family: var(--font); -webkit-font-smoothing: antialiased; }
     button { font: inherit; color: inherit; }
@@ -43,12 +81,11 @@
 
     /* ---------- Launcher: slim tab on the right edge ---------- */
     .fab { position: fixed; right: 0; top: var(--fab-y, 50%); transform: translate(4px, -50%); z-index: 2147483647; touch-action: none;
-           display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 7px 12px 6px;
-           background: var(--accent); color: #fff; border: 0; border-radius: var(--r) 0 0 var(--r); cursor: pointer;
+           display: flex; align-items: center; justify-content: center; padding: 9px 8px 9px 7px;
+           background: var(--accent); color: var(--on-accent); border: 0; border-radius: var(--r) 0 0 var(--r); cursor: pointer;
            box-shadow: -2px 2px 10px rgba(22,36,60,.2); transition: transform var(--t), right 200ms ease, background var(--t); }
     .fab:hover, .fab.on { transform: translate(0, -50%); background: var(--accent-hover); }
     .fab.dragging { cursor: grabbing; transition: none; }
-    .fab span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: var(--fs-meta); font-weight: 600; letter-spacing: .6px; }
 
     /* ---------- Panel: fixed size, pinned to the right edge, vertically movable ---------- */
     .panel { position: fixed; right: 0; top: var(--panel-y, 72px); width: var(--panel-w);
@@ -60,13 +97,24 @@
     @keyframes enter { from { transform: translateX(12px); opacity: 0 } to { transform: none; opacity: 1 } }
 
     /* Header */
-    .hd { position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 6px; border-bottom: 1px solid var(--line);
+    .hd { position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 6px; background: var(--hd-bg);
           cursor: grab; user-select: none; touch-action: none; }
     .panel.dragging .hd { cursor: grabbing; }
     .grip { width: 16px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex: none; padding: 0;
             border: 0; border-radius: 4px; background: transparent; color: var(--faint); cursor: grab; transition: color var(--t), background var(--t); }
     .grip:hover { color: var(--ink); background: var(--surface); }
     .logo { width: 24px; height: 24px; border-radius: var(--r-sm); flex: none; }
+    /* Header sits on the brand gradient: light-on-dark versions of the grip, logo, title and tools. */
+    .hd .grip { color: var(--hd-muted); }
+    .hd .grip:hover { color: var(--hd-ink); background: var(--hd-hover); }
+    .hd .logo { box-shadow: 0 0 0 2px rgba(255,255,255,.9); }
+    .hd .brand h1 { color: var(--hd-ink); }
+    .hd .brand h1 span { color: var(--hd-sub); }
+    .hd .brand p { color: var(--hd-muted); }
+    .hd .tools .ib { color: var(--hd-muted); }
+    .hd .tools .ib:hover:not(:disabled) { color: var(--hd-ink); background: var(--hd-hover); border-color: transparent; }
+    .hd .tools .ib.on { color: var(--hd-ink); background: var(--hd-on); }
+    .hd .tools .ib:focus-visible, .hd .grip:focus-visible { box-shadow: 0 0 0 2px var(--hd-ink); }
     .brand { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .whopop { position: absolute; top: calc(100% - 4px); right: 10px; z-index: 9; width: 290px; padding: 6px;
               background: var(--bg); border: 1px solid var(--line-strong); border-radius: 10px;
@@ -95,7 +143,7 @@
     .ib.on { background: var(--accent-soft); color: var(--accent); }
     .ib.spin .ic { animation: spin 900ms linear infinite; }
     [data-tip]::after { content: attr(data-tip); position: absolute; top: calc(100% + 6px); right: 0; z-index: 5; white-space: nowrap;
-          background: var(--ink); color: #fff; font-size: var(--fs-meta); font-weight: 500; padding: 4px 7px; border-radius: var(--r-sm);
+          background: var(--tip-bg); color: var(--tip-ink); font-size: var(--fs-meta); font-weight: 500; padding: 4px 7px; border-radius: var(--r-sm);
           opacity: 0; transform: translateY(-2px); pointer-events: none; transition: opacity var(--t), transform var(--t); }
     [data-tip]:hover::after, [data-tip]:focus-visible::after { opacity: 1; transform: none; transition-delay: 300ms; }
 
@@ -253,7 +301,7 @@
           border: 1px solid transparent; background: transparent; color: var(--muted); font-size: var(--fs-meta); font-weight: 600;
           cursor: pointer; font-variant-numeric: tabular-nums; transition: background var(--t), color var(--t), border-color var(--t); }
     .pg:hover:not(:disabled) { background: var(--bg); color: var(--ink); border-color: var(--line-strong); }
-    .pg[aria-current="page"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .pg[aria-current="page"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
     .pg:disabled { opacity: .35; cursor: default; }
     .gap { color: var(--muted); font-size: var(--fs-meta); padding: 0 2px; }
 
@@ -262,7 +310,7 @@
            border-radius: var(--r); border: 1px solid var(--line-strong); background: var(--bg); color: var(--ink);
            font-size: var(--fs-body); font-weight: 500; cursor: pointer; transition: background var(--t), border-color var(--t); }
     .btn:hover:not(:disabled) { background: var(--surface); border-color: var(--faint); }
-    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
     .btn.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
     .btn.sm { height: 26px; padding: 0 10px; flex: none; font-size: 11px; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
@@ -332,7 +380,7 @@
 
     /* ---------- About ---------- */
     .about { animation: fade 160ms ease; padding-bottom: 11px; }
-    .ab-hero { padding: 12px 13px 11px; background: linear-gradient(180deg, #f4f8fd 0%, var(--surface) 100%);
+    .ab-hero { padding: 12px 13px 11px; background: linear-gradient(180deg, var(--hero-top) 0%, var(--surface) 100%);
             border-bottom: 1px solid var(--line); }
     .ab-hero-top { display: flex; align-items: flex-start; gap: 6px; }
     .ab-hero-txt { flex: 1; min-width: 0; }
@@ -340,7 +388,7 @@
     .ab-ver { display: inline-block; background: var(--accent-soft); color: var(--accent); font-size: var(--fs-micro);
             font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: .2px; margin-top: 7px; }
     .ab-hero h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -.35px; line-height: 1.25; color: var(--ink); }
-    .ab-hero h2 span { color: #5b2fd6; }
+    .ab-hero h2 span { color: var(--hero-accent); }
     .ab-desc { margin: 7px 0 0; font-size: var(--fs-label); line-height: 1.55; color: var(--ink-2); }
 
     .ab-sec { padding: 11px 13px 5px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
@@ -351,6 +399,15 @@
                display: flex; align-items: center; gap: 7px; min-width: 0;
                transition: border-color var(--t), background var(--t); }
     .ab-card:hover { border-color: var(--line-strong); background: var(--surface); }
+    .ab-ic.blue { background: var(--t-blue-bg); color: var(--t-blue); }
+    .ab-ic.purple { background: var(--t-purple-bg); color: var(--t-purple); }
+    .ab-ic.green { background: var(--t-green-bg); color: var(--t-green); }
+    .ab-ic.amber { background: var(--t-amber-bg); color: var(--t-amber); }
+    /* Hero art: theme-dependent parts are re-coloured here; brand colours stay fixed. */
+    .ab-art .ha-bg { fill: var(--accent-soft); }
+    .ab-art .ha-fill { fill: var(--bg); }
+    .ab-art .ha-edge { stroke: var(--line-strong); }
+    .ab-art .ha-line { fill: var(--line); }
     .ab-ic { width: 22px; height: 22px; border-radius: 6px; flex: none;
              display: inline-flex; align-items: center; justify-content: center; }
     .ab-card b { font-size: var(--fs-label); font-weight: 650; color: var(--ink); line-height: 1.2;
@@ -378,7 +435,8 @@
     .ab-btn.li { background: #0A66C2; border-color: #0A66C2; color: #fff; }
     .ab-btn.li:hover { background: #09589f; border-color: #09589f; }
     a.btn { text-decoration: none; }
-    .ab-legal { margin: 9px 13px 0; font-size: var(--fs-micro); line-height: 1.45; color: var(--muted); }
+    .ab-legal { position: relative; margin: 9px 13px 0; padding-left: 8px; font-size: var(--fs-micro); line-height: 1.45; color: var(--muted); }
+    .ab-legal::before { content: '*'; position: absolute; left: 0; top: 0; }   /* footnote marker, hanging indent */
     /* In the About view the developer strip lives in the panel footer, so it stays visible at the bottom. */
     .footer .ab-dev { flex: 1; margin: 0; padding: 0; border-top: 0; }
 
@@ -410,25 +468,36 @@
   const DEVELOPER = 'Ajay Singh';
   const ABOUT_TEXT = 'CloudPages pile up fast across folders. ' +
     'Navigator finds the one you need in seconds and takes you straight to it.';
-  // icon, ink, tint, title, one line. Tints are pale enough that the ink stays >= 4.5:1 on them.
+  // icon, tone (--t-* tokens), title, one line.
   const FEATURES = [
-    ['zap',       '#0b5cab', '#e7effa', 'Instant Search',   'Search by name, URL, key or folder'],
-    ['folder',    '#6d28d9', '#f1ebfd', 'Folder Path',      'See full folder path for each page'],
-    ['file-text', '#1d7a4a', '#eaf6ef', 'Page Details',     'View key details at a glance'],
-    ['link',      '#9a5b0c', '#fdf1e3', 'Copy URL',         'Copy published URL with one click'],
-    ['compass',   '#0b5cab', '#e7effa', 'Quick Navigation', 'Open in Marketing Cloud directly'],
-    ['layers',    '#6d28d9', '#f1ebfd', 'Big Accounts',     'Loads thousands of pages progressively'],
+    ['zap',       'blue',   'Instant Search',   'Search by name, URL, key or folder'],
+    ['folder',    'purple', 'Folder Path',      'See full folder path for each page'],
+    ['file-text', 'green',  'Page Details',     'View key details at a glance'],
+    ['link',      'amber',  'Copy URL',         'Copy published URL with one click'],
+    ['compass',   'blue',   'Quick Navigation', 'Open in Marketing Cloud directly'],
+    ['layers',    'purple', 'Big Accounts',     'Loads thousands of pages progressively'],
   ];
+  // Edge-tab mark: a white chip holding the page + lens glyph, so the tab reads as
+  // this product rather than a generic search button. Multi-colour, so it is parsed
+  // as its own SVG document like HERO_ART - never injected as HTML.
+  const FAB_MARK = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="0" y="0" width="24" height="24" rx="6.5" fill="#fff"/>
+    <rect x="4.5" y="5" width="9.5" height="11.5" rx="2" fill="#0b5cab" opacity=".18"/>
+    <rect x="6.3" y="7.6" width="6" height="1.4" rx=".7" fill="#0b5cab" opacity=".8"/>
+    <rect x="6.3" y="10.4" width="4" height="1.4" rx=".7" fill="#0b5cab" opacity=".5"/>
+    <circle cx="15.4" cy="14.4" r="4.3" fill="none" stroke="#0b5cab" stroke-width="2.2"/>
+    <path d="M18.4 17.4 L20.6 19.6" stroke="#0b5cab" stroke-width="2.4" stroke-linecap="round"/>
+  </svg>`;
   // Hero artwork. Multi-colour, so it cannot come from the single-stroke icon set; parsed as its own
   // SVG document and imported as nodes, never injected as HTML.
   const HERO_ART = `<svg xmlns="http://www.w3.org/2000/svg" width="78" height="78" viewBox="0 0 96 96" fill="none" aria-hidden="true">
-    <circle cx="52" cy="42" r="34" fill="#e7effa"/>
-    <rect x="12" y="16" width="58" height="52" rx="7" fill="#fff" stroke="#dfe4ec"/>
+    <circle class="ha-bg" cx="52" cy="42" r="34" fill="#e7effa"/>
+    <rect class="ha-fill ha-edge" x="12" y="16" width="58" height="52" rx="7" fill="#fff" stroke="#dfe4ec"/>
     <path d="M12 23a7 7 0 0 1 7-7h44a7 7 0 0 1 7 7v4H12z" fill="#0b5cab"/>
     <circle cx="19" cy="21.5" r="1.7" fill="#fff" opacity=".85"/><circle cx="25" cy="21.5" r="1.7" fill="#fff" opacity=".6"/><circle cx="31" cy="21.5" r="1.7" fill="#fff" opacity=".4"/>
     <path d="M28 46a7 7 0 0 1 1.2-13.9A10 10 0 0 1 48 35a6 6 0 0 1 .8 11.6z" fill="#8fb8e3"/>
-    <rect x="20" y="52" width="30" height="4" rx="2" fill="#dbe7f5"/><rect x="20" y="59" width="20" height="4" rx="2" fill="#e8eef7"/>
-    <circle cx="66" cy="58" r="14" fill="#fff" stroke="#7c3aed" stroke-width="5"/>
+    <rect class="ha-line" x="20" y="52" width="30" height="4" rx="2" fill="#dbe7f5"/><rect class="ha-line" x="20" y="59" width="20" height="4" rx="2" fill="#e8eef7"/>
+    <circle class="ha-fill" cx="66" cy="58" r="14" fill="#fff" stroke="#7c3aed" stroke-width="5"/>
     <path d="M76 68 L85 77" stroke="#7c3aed" stroke-width="6" stroke-linecap="round"/>
     <path d="M60 54a7 7 0 0 1 5-5" stroke="#7c3aed" stroke-width="2.6" stroke-linecap="round" opacity=".85"/>
     <path d="M86 20l1.4 3.4L91 24.8l-3.6 1.4L86 29.6l-1.4-3.4L81 24.8l3.6-1.4z" fill="#7c3aed" opacity=".65"/>
@@ -496,8 +565,8 @@
   // ---------------------------------------------------------------------------------------------
   // mount(): builds the panel once and returns { render, query, setPositions }. Callbacks belong to main.js.
   // ---------------------------------------------------------------------------------------------
-  function mount({ meta, onOpen, onRefresh, onSearch, onPage, onFilter, onSort, onPin, onMove, onIdentity, cloudPageUrl }) {
-    const host = el('div', { id: 'cpf-host' });
+  function mount({ meta, onOpen, onRefresh, onSearch, onPage, onFilter, onSort, onPin, onMove, onIdentity, onTheme, cloudPageUrl }) {
+    const host = el('div', { id: 'cpf-host', attrs: { 'data-theme': 'light' } });
     const shadow = host.attachShadow({ mode: 'open' });
 
     // ---- identity: who is signed in, and which business unit ----
@@ -562,6 +631,21 @@
     // Header
     const whoBtn = iconButton('user', 'Account & business unit', () => toggleWho());
     const refreshBtn = iconButton('refresh-cw', 'Refresh', () => onRefresh());
+    // Theme cycles light -> dark -> system. main.js persists the choice.
+    const THEMES = { light: ['sun', 'Light', 'dark'], dark: ['moon', 'Dark', 'system'], system: ['monitor', 'System', 'light'] };
+    const themeBtn = iconButton('sun', '', () => {
+      const next = THEMES[host.dataset.theme][2];
+      setTheme(next); onTheme(next);
+    });
+    function setTheme(t) {
+      if (!THEMES[t]) t = 'light';
+      const [iconName, label] = THEMES[t];
+      host.dataset.theme = t;
+      themeBtn.replaceChildren(svg(iconName, 15));
+      themeBtn.setAttribute('aria-label', `Theme: ${label}`);
+      themeBtn.setAttribute('data-tip', `Theme: ${label}`);
+    }
+    setTheme('light');
     const infoBtn = iconButton('info', 'About & shortcuts', () => (view === 'info' ? showList() : renderInfo('about')));
     const closeBtn = iconButton('x', 'Close (Esc)', () => toggle(false));
     const [first, ...rest] = meta.name.split(' ');
@@ -573,7 +657,7 @@
       el('div', { className: 'brand' },
         el('h1', {}, first + ' ', rest.length ? el('span', { textContent: rest.join(' ') }) : null),
         tagline),
-      el('div', { className: 'tools' }, whoBtn, refreshBtn, infoBtn, closeBtn), whoPop);
+      el('div', { className: 'tools' }, whoBtn, refreshBtn, infoBtn, themeBtn, closeBtn), whoPop);
 
     const bar = el('i');
     const progress = el('div', { className: 'progress', attrs: { role: 'progressbar', 'aria-label': 'Loading CloudPages', 'aria-valuemin': 0, 'aria-valuemax': 100 } }, bar);
@@ -652,7 +736,7 @@
     const panel = el('section', { className: 'panel v-list', hidden: true, attrs: { 'aria-label': meta.name } },
       header, progress, ...listChrome, subhd, body, lfoot, footer);
     const fab = el('button', { className: 'fab', type: 'button', attrs: { 'aria-label': `Open ${meta.name} (${MOD}+K)`, title: `${meta.name} (${MOD}+K)` } },
-      svg('search', 16, 2), el('span', { textContent: 'CloudPages' }));
+      rawSvg(FAB_MARK));
     shadow.append(el('style', { textContent: STYLES }), panel, fab);
     document.body.append(host);
 
@@ -667,7 +751,8 @@
     // so its footer is always reachable. Every position calculation uses the effective height.
     const panelH = () => Math.min(PANEL_H, window.innerHeight - EDGE * 2);
     const clampPanel = y => Math.max(EDGE, Math.min(y, window.innerHeight - panelH() - EDGE)) || 0;
-    const clampFab = y => Math.max(EDGE + 40, Math.min(y, window.innerHeight - EDGE - 40));
+    const fabHalf = () => fab.offsetHeight / 2 || 40;
+    const clampFab = y => Math.max(EDGE + fabHalf(), Math.min(y, window.innerHeight - EDGE - fabHalf()));
     function applyPositions() {
       const py = clampPanel(pos.panel ?? (window.innerHeight - panelH()) / 2);
       host.style.setProperty('--panel-y', py + 'px');
@@ -731,7 +816,21 @@
     applyPositions();
 
     // ---- open / close / keyboard ----
+    // The tab may have been dragged while the panel was closed; bring the panel to it so the tab
+    // opens attached to the panel's edge instead of floating beside it.
+    function alignPanelToTab() {
+      const half = fabHalf();
+      const top = currentPanelY(), fy = currentFabY();
+      let y = top;
+      if (fy - half < top) y = fy - half;
+      else if (fy + half > top + panelH()) y = fy + half - panelH();
+      if (y === top) return;
+      pos.panel = clampPanel(y);
+      applyPositions();
+      onMove({ ...pos });
+    }
     function toggle(show) {
+      if (show) alignPanelToTab();
       panel.hidden = !show; fab.classList.toggle('on', show);
       fab.style.right = show ? `min(${PANEL_W}px, 100vw)` : '0';
       if (show) { onOpen(); if (view === 'list') input.focus(); } else fab.focus({ preventScroll: true });
@@ -1128,9 +1227,9 @@
 
     function aboutPane() {
       // One line per feature so all six fit the 468px body; full text on hover.
-      const feature = ([iconName, ink, tint, title, desc]) =>
+      const feature = ([iconName, tone, title, desc]) =>
         el('div', { className: 'ab-card', attrs: { title: desc } },
-          el('span', { className: 'ab-ic', style: `background:${tint};color:${ink}` }, svg(iconName, 12, 2.1)),
+          el('span', { className: 'ab-ic ' + tone }, svg(iconName, 12, 2.1)),
           el('b', { textContent: title }));
 
       return el('div', { className: 'about', id: 'cpn-info', attrs: { role: 'tabpanel' } },
@@ -1169,7 +1268,7 @@
         el('p', { className: 'muted', textContent: `${MOD}+K works anywhere in Marketing Cloud.` }));
     }
 
-    return { render: renderList, query: () => input.value, setPositions };
+    return { render: renderList, query: () => input.value, setPositions, setTheme };
   }
 
   (root.CPF = root.CPF || {}).ui = { mount };
