@@ -71,16 +71,18 @@ This is an independent tool. It is not affiliated with, endorsed by or sponsored
 | Store icon 128×128 | yes | `store/store-icon-128.png` (96px artwork with 16px padding, per Google's guidelines) |
 | Small promo tile 440×280 | yes | `store/promo-tile-440x280.png` |
 | Marquee 1400×560 | optional | `store/marquee-1400x560.png` |
-| Screenshots 1280×800 (or 640×400), 1 to 5 | yes, at least 1 | **You must capture these.** See below. |
+| Screenshots 1280×800, 1 to 5 | yes, at least 1 | `store/screenshots/1-search-list.png` … `5-about.png` |
 
-**Screenshots:** capture real ones in Marketing Cloud at a browser window of 1280×800:
-1. List view with search results
-2. A page's detail view
-3. Filters and sort menu, or pinned items
-4. The About screen
+**Screenshots** (`store/screenshots/`, upload in this order). Each shows the real panel code with fictional sample
+data ("Northwind") next to a caption and the Marketing Cloud address it runs on. No client data, and no
+Salesforce logos or copied Salesforce UI:
+1. `1-search-list.png`: list with pinned pages and row actions
+2. `2-account-info.png`: signed-in user, business unit (MID) and enterprise
+3. `3-page-details.png`: a page's detail view
+4. `4-dark-theme.png`: dark theme, Published filter and sort menu
+5. `5-about.png`: About screen
 
-⚠ **Blur or replace real client data** before uploading: page names, URLs, MIDs, user names, business unit names.
-A demo or sandbox business unit with sample pages is the easiest option.
+The store allows at most 5 screenshots.
 
 **Official URL / Homepage:** your GitHub repo URL once it exists. **Support URL:** the repo's Issues page, or a `mailto:` address.
 
