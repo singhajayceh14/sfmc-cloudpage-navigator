@@ -8,13 +8,13 @@ Copy and paste these answers into the Developer Dashboard (https://chrome.google
 
 - [ ] Register a developer account: one-time US$5 fee, and **2-Step Verification must be on** for the Google account.
 - [ ] **Publisher identity must match the extension.** Developer: *Ajay Singh*, `singh.ajayceh14@gmail.com`,
-      https://www.linkedin.com/in/ajay-singh-mbm/ (in `src/ui.js`, `manifest.json` and `PRIVACY.md`).
+      https://www.linkedin.com/in/ajay-singh-mbm/ (name and LinkedIn in `src/ui.js`, email in `manifest.json` and `PRIVACY.md`).
       Register the developer account as Ajay Singh, ideally with `singh.ajayceh14@gmail.com`, and set the
       same address as the verified contact email.
 - [ ] Verify the contact email in **Account → Contact email** (required before publishing).
 - [ ] **Trader declaration** (EU Digital Services Act): choose *Non-trader* for a free personal project,
       or *Trader* if you publish on behalf of a business (then address and phone are shown publicly).
-- [ ] Host `PRIVACY.md` at a public URL, for example GitHub Pages or the file's github.com link once the repo is public.
+- [x] `PRIVACY.md` is public at https://github.com/singhajayceh14/sfmc-cloudpage-navigator/blob/main/PRIVACY.md
 
 ## 1. Package
 
@@ -28,20 +28,20 @@ Upload `dist/ab-cloudpage-navigator-<version>.zip`. Every later update needs a h
 **Name** (from manifest): CloudPage Navigator
 
 **Summary** (from manifest `description`, max 132 characters):
-> Search and navigate Salesforce Marketing Cloud CloudPages by name, URL, URL key or folder. Read-only; uses your existing session.
+> Search Salesforce Marketing Cloud (SFMC) CloudPages by name, URL, URL key or folder and open them in one click. Read-only, private.
 
 **Description:**
 ```
-Find any CloudPage in seconds.
+Find any Salesforce Marketing Cloud (SFMC) CloudPage in seconds. Search landing pages, code resources and microsites by name, URL, URL key or folder, right inside Marketing Cloud.
 
-CloudPages pile up fast across folders. CloudPage Navigator adds a search panel to Salesforce Marketing Cloud so you can find the page you need and jump straight to it, without clicking through folder trees.
+CloudPages pile up fast across folders and business units. CloudPage Navigator adds a search panel to Marketing Cloud so you can find the page you need and jump straight to it, without clicking through folder trees. Built for SFMC developers, AMPscript and SSJS authors, and email marketers who manage many CloudPages.
 
 KEY FEATURES
-• Instant search by name, URL, URL key or folder path
+• Instant search by page name, published URL, URL key or folder path
 • Landing pages, code resources and microsites in one list
 • Full folder path for every page
 • Filter by Published / Draft, sort by folder, name or last modified
-• Pin favourites to the top
+• Pin favourite CloudPages to the top
 • Page details at a glance: status, type, URL key, created / modified / published dates
 • One click to copy the published URL, open the live page, or open it in CloudPages
 • Shows which user, business unit (MID) and enterprise you are signed in to
@@ -56,9 +56,9 @@ PRIVATE AND READ-ONLY
 • No analytics, no tracking, no data leaves your browser
 
 HOW TO USE
-1. Sign in to Marketing Cloud.
+1. Sign in to Salesforce Marketing Cloud.
 2. Click the blue tab on the right edge of the screen, or press Ctrl+K.
-3. Start typing.
+3. Start typing a CloudPage name, URL or folder.
 
 This is an independent tool. It is not affiliated with, endorsed by or sponsored by Salesforce, Inc. Salesforce and Marketing Cloud are trademarks of Salesforce, Inc.
 ```
@@ -84,7 +84,11 @@ Salesforce logos or copied Salesforce UI:
 
 The store allows at most 5 screenshots.
 
-**Official URL / Homepage:** your GitHub repo URL once it exists. **Support URL:** the repo's Issues page, or a `mailto:` address.
+**Homepage URL:** https://github.com/singhajayceh14/sfmc-cloudpage-navigator
+
+**Support URL:** https://github.com/singhajayceh14/sfmc-cloudpage-navigator/issues
+
+**Official URL:** leave empty. It needs a domain verified in Google Search Console, and github.com can't be verified.
 
 ## 3. Privacy practices tab
 
@@ -108,7 +112,7 @@ Then tick all three certifications:
 - [x] I do not use or transfer user data for purposes that are unrelated to my item's single purpose
 - [x] I do not use or transfer user data to determine creditworthiness or for lending purposes
 
-**Privacy policy URL:** the public URL of `PRIVACY.md`.
+**Privacy policy URL:** https://github.com/singhajayceh14/sfmc-cloudpage-navigator/blob/main/PRIVACY.md
 
 ## 4. Distribution tab
 
