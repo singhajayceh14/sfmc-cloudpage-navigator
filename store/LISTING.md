@@ -8,7 +8,7 @@ Copy and paste these answers into the Developer Dashboard (https://chrome.google
 
 - [ ] Register a developer account: one-time US$5 fee, and **2-Step Verification must be on** for the Google account.
 - [ ] **Publisher identity must match the extension.** Developer: *Ajay Singh*, `singh.ajayceh14@gmail.com`,
-      https://www.linkedin.com/in/ajay-singh-mbm/ (name and LinkedIn in `src/ui.js`, email in `manifest.json` and `PRIVACY.md`).
+      https://www.linkedin.com/in/ajay-singh-mbm/ (in `src/ui.js`, `manifest.json` and `PRIVACY.md`).
       Register the developer account as Ajay Singh, ideally with `singh.ajayceh14@gmail.com`, and set the
       same address as the verified contact email.
 - [ ] Verify the contact email in **Account → Contact email** (required before publishing).
@@ -84,7 +84,7 @@ Salesforce logos or copied Salesforce UI:
 
 The store allows at most 5 screenshots.
 
-**Homepage URL:** https://github.com/singhajayceh14/sfmc-cloudpage-navigator
+**Homepage URL:** https://www.linkedin.com/in/ajay-singh-mbm/
 
 **Support URL:** https://github.com/singhajayceh14/sfmc-cloudpage-navigator/issues
 
