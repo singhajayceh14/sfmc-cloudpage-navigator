@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CloudPage Navigator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minimum_chrome_version": "88",
   "description": "Search Salesforce Marketing Cloud (SFMC) CloudPages by name, URL, URL key or folder and open them in one click. Read-only, private.",
   "content_scripts": [
