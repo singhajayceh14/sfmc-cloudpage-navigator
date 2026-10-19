@@ -1268,7 +1268,7 @@
         el('p', { className: 'muted', textContent: `${MOD}+K works anywhere in Marketing Cloud.` }));
     }
 
-    return { render: renderList, query: () => input.value, setPositions, setTheme };
+    return { render: renderList, query: () => input.value, setPositions, setTheme, toggle: () => toggle(panel.hidden) };
   }
 
   (root.CPF = root.CPF || {}).ui = { mount };

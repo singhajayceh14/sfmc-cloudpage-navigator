@@ -14,7 +14,12 @@ See [PRIVACY.md](PRIVACY.md).
 - Copy the published URL, open the live page, or open it in CloudPages in one click
 - Shows the signed-in user, business unit (MID) and enterprise
 - Keyboard first: <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>⌘</kbd><kbd>K</kbd> on Mac) anywhere in Marketing Cloud
+- Toolbar button: opens the panel on a Marketing Cloud tab, or opens Marketing Cloud from any other tab
 - Light, dark or system theme
+
+## Install
+
+[Get it from the Chrome Web Store](https://chromewebstore.google.com/detail/ceofokjajjiifnjoahggdppebdafplde)
 
 ## Install for development
 

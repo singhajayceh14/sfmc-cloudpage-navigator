@@ -56,6 +56,13 @@
     onIdentity: () => api.getIdentity(),
   });
 
+  // Toolbar button (background.js). Always reply: an unanswered message counts as "no panel here".
+  if (root.chrome && chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
+      if (msg && msg.type === 'cpn.toggle') { view.toggle(); reply({ ok: true }); }
+    });
+  }
+
   store.get(POSITION_KEY).then(p => p && view.setPositions(p));
   store.get(THEME_KEY).then(t => t && view.setTheme(t));
   store.get(PINS_KEY).then(keys => { if (Array.isArray(keys) && keys.length) { st.pinned = new Set(keys); paint(); } });
