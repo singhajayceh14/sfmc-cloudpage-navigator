@@ -1,4 +1,6 @@
 # Build output (scripts/package.ps1)
 dist/
+# Promo videos, kept local
+store/*.mp4
 # Local knowledge graph (graphify)
 graphify-out/
