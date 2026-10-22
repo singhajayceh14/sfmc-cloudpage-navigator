@@ -16,6 +16,7 @@ See [PRIVACY.md](PRIVACY.md).
 - Keyboard first: <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>⌘</kbd><kbd>K</kbd> on Mac) anywhere in Marketing Cloud
 - Toolbar button: opens the panel on a Marketing Cloud tab, or opens the Chrome Web Store page from any other tab
 - Light, dark or system theme
+- English, French, German, Spanish and Japanese: follows the browser, or pick one in About
 
 ## Install
 
@@ -36,7 +37,10 @@ After you change the code, reload the extension on `chrome://extensions` and ref
 | `src/core.js` | Pure logic (search, filter, sort, paginate, pins). No network or DOM access. |
 | `src/api.js` | The only file that talks to Marketing Cloud (internal `/cloud/fuelapi` endpoints) |
 | `src/icons.js` | Bundled [Lucide](https://lucide.dev) icons (ISC, see `src/LUCIDE-LICENSE.txt`) |
+| `src/i18n.js` | Panel text in every language (English is the fallback) |
 | `src/ui.js` | The panel, built in Shadow DOM so its styles don't clash with Marketing Cloud's |
+| `src/background.js` | Toolbar button: toggles the panel, or opens the store page outside Marketing Cloud |
+| `_locales/` | Store summary and toolbar tooltip per language |
 | `src/main.js` | Connects `api` to `ui`, holds state and saved preferences |
 | `scripts/package.ps1` | Builds the Chrome Web Store upload zip in `dist/` |
 | `store/` | Store listing guide and graphics |

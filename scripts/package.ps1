@@ -9,7 +9,8 @@ Set-Location $root
 $version = (Get-Content manifest.json -Raw | ConvertFrom-Json).version
 $files = @('manifest.json') +
   (Get-ChildItem src -File | Where-Object { $_.Extension -in '.js', '.txt' } | ForEach-Object { "src/$($_.Name)" }) +
-  (Get-ChildItem icons -Filter *.png | ForEach-Object { "icons/$($_.Name)" })
+  (Get-ChildItem icons -Filter *.png | ForEach-Object { "icons/$($_.Name)" }) +
+  (Get-ChildItem _locales -Directory | ForEach-Object { "_locales/$($_.Name)/messages.json" })
 
 # Written entry by entry: Windows PowerShell's Compress-Archive stores "src\x.js" with backslashes,
 # which the Web Store (a Linux unzip) does not treat as folders. Entry names here always use "/".

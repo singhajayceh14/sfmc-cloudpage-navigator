@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "CloudPage Navigator",
-  "version": "1.0.2",
+  "version": "1.1.0",
+  "default_locale": "en",
   "minimum_chrome_version": "88",
-  "description": "Search Salesforce Marketing Cloud (SFMC) CloudPages by name, URL, URL key or folder and open them in one click. Read-only, private.",
+  "description": "__MSG_extDescription__",
   "content_scripts": [
     {
       "matches": [
@@ -13,6 +14,7 @@
         "src/core.js",
         "src/api.js",
         "src/icons.js",
+        "src/i18n.js",
         "src/ui.js",
         "src/main.js"
       ],
@@ -21,7 +23,7 @@
     }
   ],
   "action": {
-    "default_title": "CloudPage Navigator (Ctrl+K in Marketing Cloud)",
+    "default_title": "__MSG_actionTitle__",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

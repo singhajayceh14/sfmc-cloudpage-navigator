@@ -3,6 +3,7 @@
 // Views: 'list' (search, filters, results, footer), 'detail' (one page), 'info' (About / Shortcuts tabs).
 (function (root) {
   const icon = (...a) => root.CPF.icon(...a);
+  const t = (...a) => root.CPF.i18n.t(...a);
 
   // ---------------------------------------------------------------------------------------------
   // Design tokens. Every colour, radius and type size below comes from these variables.
@@ -419,6 +420,14 @@
     .ab-ro b { display: block; font-size: var(--fs-label); color: var(--ok-ink); font-weight: 700; }
     .ab-ro span { font-size: var(--fs-micro); color: var(--ink-2); line-height: 1.45; }
 
+    .ab-lang { margin: 8px 13px 0; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            padding: 6px 6px 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+    .ab-lang > span { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-label); font-weight: 650; color: var(--ink); }
+    .ab-lang > span svg { color: var(--t-blue); }
+    .ab-lang select { height: 26px; max-width: 62%; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+            background: var(--surface); color: var(--ink); font: inherit; font-size: var(--fs-label); cursor: pointer; }
+    .ab-lang select:focus-visible { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+
     .ab-dev { margin: 11px 13px 0; padding-top: 10px; border-top: 1px solid var(--line);
            display: flex; align-items: center; gap: 9px; }
     .ab-av { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
@@ -463,19 +472,17 @@
     }
   `;
 
-  // About screen copy lives here so wording can change without touching layout code.
-  // Contact details (email, profile link) come from manifest.json: author.email and homepage_url.
+  // About screen copy lives in i18n.js. Contact details (email, profile link) come from
+  // manifest.json: author.email and homepage_url.
   const DEVELOPER = 'Ajay Singh';
-  const ABOUT_TEXT = 'CloudPages pile up fast across folders. ' +
-    'Navigator finds the one you need in seconds and takes you straight to it.';
-  // icon, tone (--t-* tokens), title, one line.
+  // icon, tone (--t-* tokens), i18n key (title; key + '.d' is the one-line description).
   const FEATURES = [
-    ['zap',       'blue',   'Instant Search',   'Search by name, URL, key or folder'],
-    ['folder',    'purple', 'Folder Path',      'See full folder path for each page'],
-    ['file-text', 'green',  'Page Details',     'View key details at a glance'],
-    ['link',      'amber',  'Copy URL',         'Copy published URL with one click'],
-    ['compass',   'blue',   'Quick Navigation', 'Open in Marketing Cloud directly'],
-    ['layers',    'purple', 'Big Accounts',     'Loads thousands of pages progressively'],
+    ['zap',       'blue',   'f.search'],
+    ['folder',    'purple', 'f.folder'],
+    ['file-text', 'green',  'f.details'],
+    ['link',      'amber',  'f.copy'],
+    ['compass',   'blue',   'f.nav'],
+    ['layers',    'purple', 'f.big'],
   ];
   // Edge-tab mark: a white chip holding the page + lens glyph, so the tab reads as
   // this product rather than a generic search button. Multi-colour, so it is parsed
@@ -507,17 +514,15 @@
   const MOD = IS_MAC ? '⌘' : 'Ctrl';
   const TYPE_ICON = { 'Landing Page': 'file-text', 'Code Resource': 'file-code', 'Microsite': 'globe' };
 
-  // Copy per error kind (see api.js). Connection problems are amber, real failures red.
+  // Look per error kind (see api.js); copy is err.<kind>.meta/title/text in i18n.js.
+  // Connection problems are amber, real failures red.
   const ERRORS = {
-    offline: { icon: 'wifi-off', tone: 'off', meta: 'Offline', title: 'You’re offline',
-               text: 'Check your internet connection. CloudPages will load by themselves as soon as you’re back online.' },
-    network: { icon: 'cloud-off', tone: 'off', meta: 'Connection problem', title: 'Can’t reach Marketing Cloud',
-               text: 'Your connection may be slow or blocked (VPN, proxy or firewall). Check it, then try again.' },
-    auth:    { icon: 'lock', tone: 'err', meta: 'Signed out', title: 'Your session has expired',
-               text: 'Refresh Marketing Cloud to sign in again, then try again.' },
-    server:  { icon: 'circle-alert', tone: 'err', meta: 'Something went wrong', title: 'Could not load CloudPages',
-               text: 'Marketing Cloud did not respond as expected. Please try again in a moment.' },
+    offline: { icon: 'wifi-off', tone: 'off' },
+    network: { icon: 'cloud-off', tone: 'off' },
+    auth:    { icon: 'lock', tone: 'err' },
+    server:  { icon: 'circle-alert', tone: 'err' },
   };
+  const errCopy = kind => ({ ...ERRORS[kind], meta: t(`err.${kind}.meta`), title: t(`err.${kind}.title`), text: t(`err.${kind}.text`) });
   // Errors without a kind (thrown outside api.js): infer it from the message.
   const errorKind = s => (ERRORS[s.errorKind] ? s.errorKind : /logged in|401|403/i.test(s.error || s.warning || '') ? 'auth' : 'server');
 
@@ -544,12 +549,21 @@
     const doc = svgParser.parseFromString(markup, 'image/svg+xml');
     return document.importNode(doc.documentElement, true);
   }
-  const fmtDay = d => new Date(d).toLocaleDateString(undefined, { dateStyle: 'medium' });
-  const fmtTime = d => new Date(d).toLocaleTimeString(undefined, { timeStyle: 'short' });
+  // Dates follow the panel language, not only the browser's.
+  const fmtDay = d => new Date(d).toLocaleDateString(root.CPF.i18n.lang(), { dateStyle: 'medium' });
+  const fmtTime = d => new Date(d).toLocaleTimeString(root.CPF.i18n.lang(), { timeStyle: 'short' });
   const statusCls = s => (s === 'Published' ? 'pub' : s === 'Draft' ? 'draft' : '');
-  const statusBadge = s => el('span', { className: 'status ' + statusCls(s), attrs: { 'aria-label': 'Status: ' + (s || 'unknown') } },
-    statusCls(s) ? el('span', { className: 'dot ' + statusCls(s) }) : null, s || '—');
-  const typeLabel = it => (it.subtype ? `${it.type} · ${it.subtype}` : it.type);
+  // Status and type values come from the API in English; only their display is translated.
+  const statusText = s => (statusCls(s) ? t('status.' + s) : s);
+  const statusBadge = s => el('span', { className: 'status ' + statusCls(s), attrs: { 'aria-label': t('status.aria', { s: statusText(s) || t('status.unknown') }) } },
+    statusCls(s) ? el('span', { className: 'dot ' + statusCls(s) }) : null, statusText(s) || '—');
+  const typeText = type => (TYPE_ICON[type] ? t('type.' + type) : type);
+  const typeLabel = it => (it.subtype ? `${typeText(it.type)} · ${it.subtype}` : typeText(it.type));
+  // Fills a template whose placeholders become DOM nodes (e.g. a bold count), keeping word order per language.
+  const fillNodes = (s, nodes) => s.split(/(\{\w+\})/).filter(Boolean).map(p => {
+    const m = /^\{(\w+)\}$/.exec(p);
+    return m && nodes[m[1]] != null ? nodes[m[1]] : p;
+  });
   const typeIconName = type => TYPE_ICON[type] || 'file-text';
   const typeIcon = (type, size) => el('span', { className: 'type', attrs: { 'aria-hidden': 'true' } }, svg(typeIconName(type), size));
   function iconButton(name, label, onClick) {
@@ -565,14 +579,14 @@
   // ---------------------------------------------------------------------------------------------
   // mount(): builds the panel once and returns { render, query, setPositions }. Callbacks belong to main.js.
   // ---------------------------------------------------------------------------------------------
-  function mount({ meta, onOpen, onRefresh, onSearch, onPage, onFilter, onSort, onPin, onMove, onIdentity, onTheme, cloudPageUrl }) {
+  function mount({ meta, onOpen, onRefresh, onSearch, onPage, onFilter, onSort, onPin, onMove, onIdentity, onTheme, onLang, cloudPageUrl }) {
     const host = el('div', { id: 'cpf-host', attrs: { 'data-theme': 'light' } });
     const shadow = host.attachShadow({ mode: 'open' });
 
     // ---- identity: who is signed in, and which business unit ----
     // Ids come from the API; names are read off Marketing Cloud's own header. Loaded on first open.
-    const tagline = el('p', { textContent: 'CloudPage search & navigation' });
-    const whoPop = el('div', { className: 'whopop', hidden: true, attrs: { role: 'dialog', 'aria-label': 'Account details' } });
+    const tagline = el('p');
+    const whoPop = el('div', { className: 'whopop', hidden: true, attrs: { role: 'dialog' } });
     let who = null, whoLoading = false;
 
     const whoOpen = () => !whoPop.hidden;
@@ -589,10 +603,10 @@
     }
     function setIdentity(v) { whoLoading = false; who = v; applyTagline(); if (whoOpen()) renderWho(); }
     function applyTagline() {
-      if (!who || who.error) return;
-      const bu = who.buName || 'Business unit';
+      if (!who || who.error) { tagline.textContent = t('tagline'); tagline.title = ''; return; }
+      const bu = who.buName || t('who.buFallback');
       tagline.textContent = who.mid ? `${bu} · ${who.mid}` : bu;   // no room for a "MID" label
-      tagline.title = [who.userName && `Signed in as ${who.userName}`, who.buName, who.mid && `MID ${who.mid}`]
+      tagline.title = [who.userName && t('who.signedInAsName', { name: who.userName }), who.buName, who.mid && `MID ${who.mid}`]
         .filter(Boolean).join(' · ');
     }
     function whoRow(iconName, label, value, id) {
@@ -600,7 +614,7 @@
         el('b', { textContent: value || '—' }),
         id ? el('code', { textContent: id }) : null);
       const copyable = id || value;
-      const btn = copyable ? actBtn('copy', `Copy ${label}`, true, async b => {
+      const btn = copyable ? actBtn('copy', t('who.copy', { label }), true, async b => {
         let ok = true; try { await navigator.clipboard.writeText(copyable); } catch { ok = false; }
         b.replaceChildren(svg(ok ? 'check' : 'x', 13, 2)); b.style.color = ok ? 'var(--ok-ink)' : 'var(--danger)';
         setTimeout(() => { b.replaceChildren(svg('copy', 13, 2)); b.style.color = ''; }, 1400);
@@ -614,43 +628,41 @@
       if (who && who.error) {
         const offline = who.kind === 'offline' || who.kind === 'network';
         whoPop.replaceChildren(el('div', { className: 'who-msg' }, svg(offline ? 'wifi-off' : 'circle-alert', 13, 2),
-          offline ? 'You’re offline. Reconnect, then open this again.' : 'Could not read account details.'));
+          offline ? t('who.offline') : t('who.failed')));
         return;
       }
       if (!who) {
-        whoPop.replaceChildren(el('div', { className: 'who-msg' }, el('span', { className: 'spinner' }), 'Reading account…'));
+        whoPop.replaceChildren(el('div', { className: 'who-msg' }, el('span', { className: 'spinner' }), t('who.reading')));
         return;
       }
       whoPop.replaceChildren(
-        whoRow('user', 'Signed in as', who.userName, who.userId),
-        whoRow('building-2', 'Business unit', who.buName, who.mid),
-        whoRow('hash', 'Enterprise', who.entName, who.eid),
+        whoRow('user', t('who.signedInAs'), who.userName, who.userId),
+        whoRow('building-2', t('who.bu'), who.buName, who.mid),
+        whoRow('hash', t('who.ent'), who.entName, who.eid),
       );
     }
 
-    // Header
-    const whoBtn = iconButton('user', 'Account & business unit', () => toggleWho());
-    const refreshBtn = iconButton('refresh-cw', 'Refresh', () => onRefresh());
+    // Header. Labels are set in relabel(), so a language change can reapply them.
+    const label = (b, text) => { b.setAttribute('aria-label', text); b.setAttribute('data-tip', text); };
+    const whoBtn = iconButton('user', '', () => toggleWho());
+    const refreshBtn = iconButton('refresh-cw', '', () => onRefresh());
     // Theme cycles light -> dark -> system. main.js persists the choice.
-    const THEMES = { light: ['sun', 'Light', 'dark'], dark: ['moon', 'Dark', 'system'], system: ['monitor', 'System', 'light'] };
+    const THEMES = { light: ['sun', 'dark'], dark: ['moon', 'system'], system: ['monitor', 'light'] };
     const themeBtn = iconButton('sun', '', () => {
-      const next = THEMES[host.dataset.theme][2];
+      const next = THEMES[host.dataset.theme][1];
       setTheme(next); onTheme(next);
     });
-    function setTheme(t) {
-      if (!THEMES[t]) t = 'light';
-      const [iconName, label] = THEMES[t];
-      host.dataset.theme = t;
-      themeBtn.replaceChildren(svg(iconName, 15));
-      themeBtn.setAttribute('aria-label', `Theme: ${label}`);
-      themeBtn.setAttribute('data-tip', `Theme: ${label}`);
+    function setTheme(name) {
+      if (!THEMES[name]) name = 'light';
+      host.dataset.theme = name;
+      themeBtn.replaceChildren(svg(THEMES[name][0], 15));
+      label(themeBtn, t('theme', { name: t('theme.' + name) }));
     }
     setTheme('light');
-    const infoBtn = iconButton('info', 'About & shortcuts', () => (view === 'info' ? showList() : renderInfo('about')));
-    const closeBtn = iconButton('x', 'Close (Esc)', () => toggle(false));
+    const infoBtn = iconButton('info', '', () => (view === 'info' ? showList() : renderInfo('about')));
+    const closeBtn = iconButton('x', '', () => toggle(false));
     const [first, ...rest] = meta.name.split(' ');
-    const grip = el('button', { className: 'grip', type: 'button',
-      attrs: { 'aria-label': 'Move panel up or down (drag, or use arrow keys)', title: 'Drag to move · ↑ ↓ keys' } }, svg('grip-vertical', 14, 2));
+    const grip = el('button', { className: 'grip', type: 'button' }, svg('grip-vertical', 14, 2));
     const header = el('header', { className: 'hd' },
       grip,
       meta.iconUrl ? el('img', { className: 'logo', src: meta.iconUrl, alt: '' }) : null,
@@ -660,31 +672,28 @@
       el('div', { className: 'tools' }, whoBtn, refreshBtn, infoBtn, themeBtn, closeBtn), whoPop);
 
     const bar = el('i');
-    const progress = el('div', { className: 'progress', attrs: { role: 'progressbar', 'aria-label': 'Loading CloudPages', 'aria-valuemin': 0, 'aria-valuemax': 100 } }, bar);
+    const progress = el('div', { className: 'progress', attrs: { role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100 } }, bar);
 
     // Toolbar: search + filter chips
-    const input = el('input', { type: 'search', placeholder: 'Search name, URL, key or folder…', spellcheck: false, autocomplete: 'off',
-      attrs: { 'aria-label': 'Search CloudPages', 'aria-controls': 'cpn-results' } });
-    const clearBtn = el('button', { className: 'clear', type: 'button', hidden: true, attrs: { 'aria-label': 'Clear search' } }, svg('x', 13, 2));
+    const input = el('input', { type: 'search', spellcheck: false, autocomplete: 'off', attrs: { 'aria-controls': 'cpn-results' } });
+    const clearBtn = el('button', { className: 'clear', type: 'button', hidden: true }, svg('x', 13, 2));
     const kbdHint = el('kbd', { textContent: `${MOD} K`, attrs: { 'aria-hidden': 'true' } });
-    const chips = el('div', { className: 'chips', attrs: { role: 'group', 'aria-label': 'Filter by status' } });
+    const chips = el('div', { className: 'chips', attrs: { role: 'group' } });
     // Sort control. Custom listbox because a native <select> dropdown can't be styled;
-    // keyboard behaviour matches a select.
-    const SORT_LABELS = [['folder', 'Folder', 'Folder path, as in CloudPages'],
-                         ['name', 'Name', 'Name, A to Z'],
-                         ['modified', 'Newest', 'Last modified, newest first']];
+    // keyboard behaviour matches a select. Labels are i18n keys sort.<mode> and sort.<mode>.hint.
+    const SORT_MODES = ['folder', 'name', 'modified'];
     let sortValue = 'folder';
-    const sortLabel = el('span', { textContent: 'Folder' });
+    const sortLabel = el('span');
     const sortBtn = el('button', { className: 'sortbtn', type: 'button',
-      attrs: { 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-label': 'Sort results' } },
+      attrs: { 'aria-haspopup': 'listbox', 'aria-expanded': 'false' } },
       sortLabel, el('i', { className: 'caret', attrs: { 'aria-hidden': 'true' } }));
-    const sortMenu = el('ul', { className: 'sortmenu', hidden: true, attrs: { role: 'listbox', 'aria-label': 'Sort by' } });
+    const sortMenu = el('ul', { className: 'sortmenu', hidden: true, attrs: { role: 'listbox' } });
 
     function renderSortMenu() {
-      sortMenu.replaceChildren(...SORT_LABELS.map(([v, label, hint]) => {
+      sortMenu.replaceChildren(...SORT_MODES.map(v => {
         const li = el('li', { className: 'sortopt' + (v === sortValue ? ' on' : ''), tabIndex: -1,
-          attrs: { role: 'option', 'aria-selected': String(v === sortValue), 'data-v': v, title: hint } },
-          el('span', { textContent: label }), v === sortValue ? svg('check', 13, 2.4) : null);
+          attrs: { role: 'option', 'aria-selected': String(v === sortValue), 'data-v': v, title: t(`sort.${v}.hint`) } },
+          el('span', { textContent: t('sort.' + v) }), v === sortValue ? svg('check', 13, 2.4) : null);
         li.onclick = () => { closeSort(); if (v !== sortValue) onSort(v); };
         return li;
       }));
@@ -725,7 +734,7 @@
       el('span', { attrs: { 'aria-live': 'polite' } }, metaText), el('div', { className: 'sortwrap' }, sortBtn, sortMenu));
     const body = el('div', { className: 'body', id: 'cpn-results' });
     const range = el('span');
-    const pager = el('nav', { className: 'pager', attrs: { 'aria-label': 'Pagination' } });
+    const pager = el('nav', { className: 'pager' });
     // Icon only; the text is in the tooltip and aria-label.
     const conn = el('span', { className: 'conn', attrs: { role: 'status', 'aria-live': 'polite' } }, svg('wifi', 13, 2));
     const lfoot = el('div', { className: 'lfoot', hidden: true }, el('div', { className: 'lfoot-l' }, conn, range), pager);
@@ -735,10 +744,35 @@
 
     const panel = el('section', { className: 'panel v-list', hidden: true, attrs: { 'aria-label': meta.name } },
       header, progress, ...listChrome, subhd, body, lfoot, footer);
-    const fab = el('button', { className: 'fab', type: 'button', attrs: { 'aria-label': `Open ${meta.name} (${MOD}+K)`, title: `${meta.name} (${MOD}+K)` } },
+    const fab = el('button', { className: 'fab', type: 'button', attrs: { title: `${meta.name} (${MOD}+K)` } },
       rawSvg(FAB_MARK));
     shadow.append(el('style', { textContent: STYLES }), panel, fab);
     document.body.append(host);
+
+    // Text on elements built once above. Views re-render their own text when drawn.
+    function relabel() {
+      host.lang = root.CPF.i18n.lang();
+      applyTagline();
+      whoPop.setAttribute('aria-label', t('who.dialog'));
+      label(whoBtn, t('who.btn'));
+      label(refreshBtn, t('refresh'));
+      label(infoBtn, t('info.btn'));
+      label(closeBtn, t('close'));
+      setTheme(host.dataset.theme);
+      grip.setAttribute('aria-label', t('grip.aria'));
+      grip.title = t('grip.title');
+      progress.setAttribute('aria-label', t('loading.aria'));
+      input.placeholder = t('search.placeholder');
+      input.setAttribute('aria-label', t('search.aria'));
+      clearBtn.setAttribute('aria-label', t('search.clear'));
+      chips.setAttribute('aria-label', t('filter.aria'));
+      sortLabel.textContent = t('sort.' + sortValue);
+      sortBtn.setAttribute('aria-label', t('sort.aria'));
+      sortMenu.setAttribute('aria-label', t('sort.menu'));
+      pager.setAttribute('aria-label', t('pager.aria'));
+      fab.setAttribute('aria-label', t('fab', { name: meta.name, mod: MOD }));
+    }
+    relabel();
 
     // ---- state held by the view (presentation only, never data) ----
     let view = 'list', lastState = null, listScroll = 0, selectedKey = null;
@@ -887,7 +921,7 @@
       (sel || input).focus({ preventScroll: true });
     }
     function backBar(label, onBack, extra) {
-      const b = el('button', { className: 'back', type: 'button', title: label + ' (Esc)' }, svg('arrow-left', 14, 2), label);
+      const b = el('button', { className: 'back', type: 'button', title: `${label} (${t('key.esc')})` }, svg('arrow-left', 14, 2), label);
       b.onclick = onBack;
       subhd.replaceChildren(b, extra || '');
     }
@@ -925,8 +959,8 @@
           iconName ? null : label, el('b', { textContent: c[key] ?? 0 }));
         b.onclick = () => onFilter(key); return b;
       };
-      chips.replaceChildren(chip('all', 'All'), chip('Published', 'Published', 'pub'), chip('Draft', 'Draft', 'draft'),
-        chip('pinned', 'Pinned', null, 'pin'));
+      chips.replaceChildren(chip('all', t('chip.all')), chip('Published', statusText('Published'), 'pub'),
+        chip('Draft', statusText('Draft'), 'draft'), chip('pinned', t('chip.pinned'), null, 'pin'));
     }
 
     // ---- row actions (copy / open live / pin) ----
@@ -946,19 +980,19 @@
     }
 
     function rowActions(it) {
-      const copy = actBtn('copy', 'Copy URL', !!it.url, async b => {
+      const copy = actBtn('copy', t('act.copy'), !!it.url, async b => {
         let ok = true;
         try { await navigator.clipboard.writeText(it.url); } catch { ok = false; }
         b.replaceChildren(svg(ok ? 'check' : 'x', 13, 2));
         b.style.color = ok ? 'var(--ok-ink)' : 'var(--danger)';
-        b.setAttribute('data-tip', ok ? 'Copied' : 'Copy failed');
-        setTimeout(() => { b.replaceChildren(svg('copy', 13, 2)); b.style.color = ''; b.setAttribute('data-tip', 'Copy URL'); }, 1400);
+        b.setAttribute('data-tip', ok ? t('act.copied') : t('act.copyFailed'));
+        setTimeout(() => { b.replaceChildren(svg('copy', 13, 2)); b.style.color = ''; b.setAttribute('data-tip', t('act.copy')); }, 1400);
       });
-      const live = canLive(it) ? actBtn('external-link', 'Open live page', true, () => openExternal(it.url)) : null;
+      const live = canLive(it) ? actBtn('external-link', t('act.live'), true, () => openExternal(it.url)) : null;
       // Same target as the detail view's primary button.
-      const edit = actBtn('square-code', 'Open in CloudPages', true, () => openExternal(cloudPageUrl(it)));
+      const edit = actBtn('square-code', t('act.edit'), true, () => openExternal(cloudPageUrl(it)));
       const on = isPinned(it);
-      const pin = actBtn(on ? 'pin-off' : 'pin', on ? 'Unpin' : 'Pin to top', true, () => onPin(keyOf(it)), on);
+      const pin = actBtn(on ? 'pin-off' : 'pin', on ? t('act.unpin') : t('act.pin'), true, () => onPin(keyOf(it)), on);
       return el('div', { className: 'acts' }, copy, live, edit, pin);
     }
 
@@ -971,26 +1005,26 @@
       filters.hidden = !!state.error || !state.loaded;   // counts are meaningless until data arrives
       if (state.sort && state.sort !== sortValue) {
         sortValue = state.sort;
-        sortLabel.textContent = (SORT_LABELS.find(o => o[0] === sortValue) || [, 'Folder'])[1];
+        sortLabel.textContent = t('sort.' + sortValue);
       }
       pinned = state.pinned instanceof Set ? state.pinned : new Set(state.pinned || []);
       renderChips(state);
 
       if (state.error) {
         const kind = errorKind(state);
-        const e = ERRORS[kind];
+        const e = errCopy(kind);
         metaText.replaceChildren(svg(e.icon, 11, 2), e.meta);
-        const retry = el('button', { className: 'btn sm', type: 'button' }, svg('refresh-cw', 13, 2), 'Try again');
+        const retry = el('button', { className: 'btn sm', type: 'button' }, svg('refresh-cw', 13, 2), t('list.tryAgain'));
         retry.onclick = () => onRefresh();
         const box = stateBox({ iconName: e.icon, title: e.title, text: e.text, action: retry, tone: e.tone });
         // main.js reloads automatically once back online.
-        if (kind === 'offline') box.append(el('div', { className: 'waiting' }, el('span', { className: 'pulse' }), 'Waiting for connection…'));
+        if (kind === 'offline') box.append(el('div', { className: 'waiting' }, el('span', { className: 'pulse' }), t('list.waiting')));
         else box.append(el('code', { className: 'tech', textContent: state.error }));
         body.replaceChildren(box);
         listFoot(state, false); return;
       }
       if (!state.loaded && state.loading) {
-        metaText.replaceChildren(el('span', { className: 'spinner' }), 'Connecting to Marketing Cloud…');
+        metaText.replaceChildren(el('span', { className: 'spinner' }), t('list.connecting'));
         body.replaceChildren(skeleton()); listFoot(state, false); return;
       }
 
@@ -999,36 +1033,35 @@
       if (state.warning && !state.loading) {
         // Partial load: keep what arrived, show a warning and a retry link.
         const kind = errorKind(state);
-        const retry = el('button', { className: 'metaretry', type: 'button', textContent: 'Retry' });
+        const retry = el('button', { className: 'metaretry', type: 'button', textContent: t('list.retry') });
         retry.onclick = () => onRefresh();
-        const partial = state.loaded < state.total ? `${state.loaded} of ${state.total} loaded` : `${state.loaded} loaded`;
+        const partial = state.loaded < state.total
+          ? t('list.partialOf', { loaded: state.loaded, total: state.total }) : t('list.partialN', { loaded: state.loaded });
         const note = el('span', { className: 'warn', title: state.warning,
-          textContent: kind === 'offline' ? `Offline · ${partial} · resumes when online` : `Partial: ${partial}` });
+          textContent: kind === 'offline' ? t('list.offlinePartial', { partial }) : t('list.partial', { partial }) });
         // No retry link offline; main.js resumes on reconnect.
         metaText.replaceChildren(svg(kind === 'offline' ? 'wifi-off' : 'circle-alert', 11, 2), note, ...(kind === 'offline' ? [] : [retry]));
       } else if (state.offline && !state.loading) {
         // Fully loaded before going offline; search still works on loaded data.
         metaText.replaceChildren(svg('wifi-off', 11, 2),
-          el('span', { className: 'warn', textContent: 'Offline' }),
-          el('span', { title: 'Search works on loaded pages. Opening a page needs a connection.',
-            textContent: ` · searching ${state.matches} of ${total} loaded` }));
+          el('span', { className: 'warn', textContent: t('list.offline') }),
+          el('span', { title: t('list.offlineTip'), textContent: t('list.searching', { n: state.matches, total }) }));
       } else metaText.replaceChildren(...(state.loading
-        ? [el('span', { className: 'spinner' }), `Loading ${state.loaded} of ${state.total}…`]
-        : [el('strong', { textContent: state.matches }), ` of ${total} CloudPages`]));
+        ? [el('span', { className: 'spinner' }), t('list.loading', { loaded: state.loaded, total: state.total })]
+        : fillNodes(t('list.count', { total }), { n: el('strong', { textContent: state.matches }) })));
 
       if (!state.rows.length) {
         const filtered = !!state.query || state.status !== 'all';
         let clear = null;
         if (filtered && !state.loading) {
-          clear = el('button', { className: 'btn sm', type: 'button', textContent: 'Clear search & filters' });
+          clear = el('button', { className: 'btn sm', type: 'button', textContent: t('list.clearAll') });
           clear.onclick = () => { if (state.status !== 'all') onFilter('all'); setQuery(''); input.focus(); };
         }
         const box = state.loading
-          ? stateBox({ iconName: 'search', title: 'No matches yet', text: `Still loading — ${state.loaded} of ${state.total} checked.` })
+          ? stateBox({ iconName: 'search', title: t('list.noMatchesYet'), text: t('list.stillLoading', { loaded: state.loaded, total: state.total }) })
           : state.status === 'pinned' && !state.query
-            ? stateBox({ iconName: 'pin', title: 'Nothing pinned yet',
-                         text: 'Hover any result and use the pin button to keep it here.' })
-            : stateBox({ iconName: 'search-x', title: 'No CloudPages found', text: 'Try searching by name, URL, folder or URL key.', action: clear });
+            ? stateBox({ iconName: 'pin', title: t('list.nothingPinned'), text: t('list.nothingPinnedText') })
+            : stateBox({ iconName: 'search-x', title: t('list.none'), text: t('list.noneText'), action: clear });
         body.replaceChildren(box);
         listFoot(state, false); return;
       }
@@ -1041,19 +1074,19 @@
         el('li', { className: 'group' + (iconName ? ' fav' : ''), attrs: { role: 'presentation' } },
           iconName ? svg(iconName, 12, 2) : null, label, count != null ? el('b', { textContent: ' ' + count }) : null);
 
-      const list = el('ul', { className: 'list', attrs: { 'aria-label': 'CloudPages' } }, state.rows.map((it, idx) => {
+      const list = el('ul', { className: 'list', attrs: { 'aria-label': t('list.aria') } }, state.rows.map((it, idx) => {
         const pathText = it.path.join(' › ') || '—';
         const cls = statusCls(it.status);
         const row = el('li', { className: 'row' + (keyOf(it) === selectedKey ? ' sel' : ''), tabIndex: 0,
           attrs: { 'data-key': keyOf(it), role: 'button', title: `${it.name}\n${pathText}`,
-                   'aria-label': `${it.name}, ${it.status || 'unknown status'}, ${pathText}` } },
+                   'aria-label': `${it.name}, ${statusText(it.status) || t('status.unknown')}, ${pathText}` } },
           el('span', { className: 'dot ' + cls, attrs: { 'aria-hidden': 'true' } }),
           el('div', { className: 'main' },
             el('div', { className: 'name', textContent: it.name }),
             el('div', { className: 'path', textContent: pathText })),
           el('div', { className: 'rside' },
             isPinned(it) ? el('span', { className: 'pinned-mark', attrs: { 'aria-hidden': 'true' } }, svg('pin', 12, 2)) : null,
-            el('span', { className: 'word ' + cls, textContent: it.status || '—' }),
+            el('span', { className: 'word ' + cls, textContent: statusText(it.status) || '—' }),
             rowActions(it)),
           el('span', { className: 'go', attrs: { 'aria-hidden': 'true' } }, svg('chevron-right', 14, 2)));
         const open = () => { selectedKey = keyOf(it); listScroll = body.scrollTop; renderDetail(it); };
@@ -1066,8 +1099,8 @@
         };
         if (!anyPinned) return row;
         const head = isPinned(it)
-          ? (openedPinned ? null : (openedPinned = true, groupHeader('pin', 'Pinned', state.pinnedCount)))
-          : (openedRest ? null : (openedRest = true, groupHeader(null, 'All CloudPages')));
+          ? (openedPinned ? null : (openedPinned = true, groupHeader('pin', t('group.pinned'), state.pinnedCount)))
+          : (openedRest ? null : (openedRest = true, groupHeader(null, t('group.all'))));
         return head ? [head, row] : row;
       }));
       const scroll = restoreScroll ? listScroll : body.scrollTop;
@@ -1080,14 +1113,13 @@
     // Red only for network problems; auth and server errors mean the connection itself is fine.
     function listFoot(state, hasRows) {
       const down = state.offline || errorKind(state) === 'offline' && !!(state.error || state.warning)
-        ? 'Offline'
-        : (state.error || state.warning) && errorKind(state) === 'network' ? 'Connection problem' : '';
+        ? 'offline'
+        : (state.error || state.warning) && errorKind(state) === 'network' ? 'problem' : '';
       conn.classList.toggle('bad', !!down);
-      conn.replaceChildren(svg(down === 'Offline' ? 'wifi-off' : down ? 'cloud-off' : 'wifi', 13, 2));
-      conn.title = down ? (down === 'Offline' ? 'Offline: no internet connection' : 'Connection problem: Marketing Cloud is not responding')
-                        : 'Online: connected to Marketing Cloud';
+      conn.replaceChildren(svg(down === 'offline' ? 'wifi-off' : down ? 'cloud-off' : 'wifi', 13, 2));
+      conn.title = t('conn.' + (down || 'online'));
       conn.setAttribute('aria-label', conn.title);
-      range.textContent = hasRows ? `${state.from}–${state.to} of ${state.matches}` : '';
+      range.textContent = hasRows ? t('range', { from: state.from, to: state.to, n: state.matches }) : '';
       range.hidden = !hasRows;
       if (hasRows) renderPager(state); else pager.hidden = true;
       lfoot.hidden = false;
@@ -1102,20 +1134,22 @@
         b.onclick = () => go(target); return b;
       };
       pager.replaceChildren(
-        nav('chevron-left', page - 1, 'Previous page', page === 1),
+        nav('chevron-left', page - 1, t('pager.prev'), page === 1),
         ...root.CPF.core.pageNumbers(page, pages).map(n => {
           if (n === '…') return el('span', { className: 'gap', textContent: '…', attrs: { 'aria-hidden': 'true' } });
           const b = el('button', { className: 'pg', type: 'button', textContent: String(n),
-            attrs: { 'aria-label': `Page ${n}`, 'aria-current': n === page ? 'page' : null } });
+            attrs: { 'aria-label': t('pager.page', { n }), 'aria-current': n === page ? 'page' : null } });
           b.onclick = () => go(n); return b;
         }),
-        nav('chevron-right', page + 1, 'Next page', page === pages));
+        nav('chevron-right', page + 1, t('pager.next'), page === pages));
     }
 
     // ---- detail view ----
+    let detailItem = null;     // kept so a language change can redraw the open page
     function renderDetail(it) {
+      detailItem = it;
       setChrome('detail');
-      backBar('Back to search', showList);
+      backBar(t('back.search'), showList);
 
       // Location: each folder is a chip; the page itself is highlighted at the end
       const parts = [...it.path, it.name];
@@ -1132,7 +1166,7 @@
           let ok = true;
           try { await navigator.clipboard.writeText(text); } catch { ok = false; }
           b.replaceChildren(svg(ok ? 'check' : 'x', 14, 2));
-          b.setAttribute('data-tip', ok ? 'Copied' : 'Copy failed');
+          b.setAttribute('data-tip', ok ? t('act.copied') : t('act.copyFailed'));
           b.style.color = ok ? 'var(--ok-ink)' : 'var(--danger)';
           setTimeout(() => { b.replaceChildren(svg('copy', 14)); b.setAttribute('data-tip', label); b.style.color = ''; }, 1500);
         };
@@ -1141,7 +1175,7 @@
       const live = canLive(it);
       let liveBtn = null;
       if (live) {
-        liveBtn = el('button', { className: 'ib', type: 'button', attrs: { 'aria-label': 'Open live page', 'data-tip': 'Open live page' } }, svg('external-link', 14));
+        liveBtn = el('button', { className: 'ib', type: 'button', attrs: { 'aria-label': t('act.live'), 'data-tip': t('act.live') } }, svg('external-link', 14));
         liveBtn.onclick = () => openExternal(it.url);
       }
 
@@ -1152,43 +1186,45 @@
         el('div', { className: 'tile' },
           el('span', { className: 'tile-ic ' + tone, attrs: { 'aria-hidden': 'true' } }, svg(iconName, 12, 2)),
           el('div', { className: 'tile-txt' }, el('dt', { textContent: label }),
-            el('dd', { className: (value ? cls : 'muted'), textContent: value || 'Not available' },
+            el('dd', { className: (value ? cls : 'muted'), textContent: value || t('detail.na') },
               value && sub ? el('small', { textContent: sub }) : null)));
       const dateTile = (iconName, tone, label, iso) => tile(iconName, tone, label, iso && fmtDay(iso), '', iso && fmtTime(iso));
       const pub = it.status === 'Published';
-      const keyTile = tile('key-round', '', 'URL key', it.key, 'mono');
-      if (it.key) keyTile.append(copyBtn(it.key, 'Copy URL key'));
+      const keyTile = tile('key-round', '', t('detail.urlKey'), it.key, 'mono');
+      if (it.key) keyTile.append(copyBtn(it.key, t('detail.copyKey')));
 
       body.replaceChildren(el('article', { className: 'detail', attrs: { 'aria-label': it.name } },
         el('div', { className: 'card hero' }, typeIcon(it.type, 16),
           el('div', { className: 'hero-txt' }, el('h2', { textContent: it.name }),
             el('div', { className: 'tags' }, statusBadge(it.status), el('span', { className: 'tag', textContent: typeLabel(it) })))),
-        card('folder-open', 'Location', el('div', { className: 'crumbs' }, crumbs)),
-        card('link', pub ? 'Published URL' : 'URL', el('div', { className: 'urlbox' }, el('code', { textContent: it.url || 'No URL' }), copyBtn(it.url, 'Copy URL'), liveBtn)),
+        card('folder-open', t('detail.location'), el('div', { className: 'crumbs' }, crumbs)),
+        card('link', pub ? t('detail.pubUrl') : t('detail.url'), el('div', { className: 'urlbox' }, el('code', { textContent: it.url || t('detail.noUrl') }), copyBtn(it.url, t('act.copy')), liveBtn)),
         // Status and type are shown in the hero tags.
         el('dl', { className: 'tiles' },
-          dateTile('calendar-plus', 'slate', 'Created', it.createdDate),
-          dateTile('calendar-clock', 'slate', 'Last modified', it.modifiedDate),
-          dateTile('send', pub ? 'green' : 'slate', 'Published', it.publishDate),
+          dateTile('calendar-plus', 'slate', t('detail.created'), it.createdDate),
+          dateTile('calendar-clock', 'slate', t('detail.modified'), it.modifiedDate),
+          dateTile('send', pub ? 'green' : 'slate', t('detail.published'), it.publishDate),
           keyTile)));
       body.scrollTop = 0;
 
       let openLive = null;
       if (live) {
-        openLive = el('button', { className: 'btn', type: 'button', attrs: { title: 'Open the published page in a new tab' } }, svg('external-link', 14), 'View live page');
+        openLive = el('button', { className: 'btn', type: 'button', attrs: { title: t('detail.viewLiveTip') } }, svg('external-link', 14), t('detail.viewLive'));
         openLive.onclick = () => openExternal(it.url);
       }
-      const openCp = el('button', { className: 'btn primary', type: 'button', attrs: { title: 'Opens in a new tab' } }, 'Open in CloudPages', svg('square-code', 14, 2));
+      const openCp = el('button', { className: 'btn primary', type: 'button', attrs: { title: t('detail.newTab') } }, t('act.edit'), svg('square-code', 14, 2));
       openCp.onclick = () => openExternal(cloudPageUrl(it));   // new tab, so the current search is kept
       footer.replaceChildren(...[openLive, openCp].filter(Boolean));
       openCp.focus({ preventScroll: true });
     }
 
     // ---- info view: About | Shortcuts ----
+    let redrawInfo = null;     // set while the info view is open
     function renderInfo(tab) {
-      const cameFrom = view === 'detail' ? { node: body.firstChild, footer: [...footer.children] } : null;
+      const cameFrom = view === 'detail'
+        ? { node: body.firstChild, footer: [...footer.children], item: detailItem, lang: root.CPF.i18n.lang() } : null;
       setChrome('info');
-      const tabs = el('div', { className: 'tabs', attrs: { role: 'tablist', 'aria-label': 'Information' } });
+      const tabs = el('div', { className: 'tabs', attrs: { role: 'tablist' } });
       const mkTab = (key, label) => {
         const b = el('button', { className: 'tab', type: 'button', textContent: label,
           attrs: { role: 'tab', 'aria-selected': String(tab === key), 'aria-controls': 'cpn-info' } });
@@ -1196,64 +1232,85 @@
         return b;
       };
       const back = () => {
-        if (cameFrom) {
-          setChrome('detail'); backBar('Back to search', showList); body.replaceChildren(cameFrom.node); footer.replaceChildren(...cameFrom.footer);
+        redrawInfo = null;
+        // The saved page is in the old language if it changed meanwhile; draw it again instead.
+        if (cameFrom && cameFrom.lang !== root.CPF.i18n.lang()) renderDetail(cameFrom.item);
+        else if (cameFrom) {
+          setChrome('detail'); backBar(t('back.search'), showList); body.replaceChildren(cameFrom.node); footer.replaceChildren(...cameFrom.footer);
           (footer.querySelector('.primary') || subhd.querySelector('.back')).focus({ preventScroll: true });
         }
         else showList();
       };
       function draw() {
-        tabs.replaceChildren(mkTab('about', 'About'), mkTab('keys', 'Shortcuts'));
-        backBar(cameFrom ? 'Back to page' : 'Back to search', back, tabs);
+        tabs.setAttribute('aria-label', t('info.aria'));
+        tabs.replaceChildren(mkTab('about', t('tab.about')), mkTab('keys', t('tab.keys')));
+        backBar(cameFrom ? t('back.page') : t('back.search'), back, tabs);
         body.replaceChildren(tab === 'about' ? aboutPane() : keysPane());
         body.scrollTop = 0;
         // Developer details sit in the footer on the About tab so they don't scroll away.
         footer.hidden = tab !== 'about';
         footer.replaceChildren(...(tab === 'about' ? [devStrip()] : []));
       }
+      redrawInfo = draw;
       draw();
     }
 
     function devStrip() {
       return el('div', { className: 'ab-dev' },
         el('span', { className: 'ab-av', textContent: initials(DEVELOPER), attrs: { 'aria-hidden': 'true' } }),
-        el('div', { className: 'ab-dtxt' }, el('b', { textContent: DEVELOPER }), el('span', { textContent: 'Developer' })),
+        el('div', { className: 'ab-dtxt' }, el('b', { textContent: DEVELOPER }), el('span', { textContent: t('dev.role') })),
         el('div', { className: 'ab-dacts' },
           meta.email ? el('a', { className: 'ab-btn', href: 'mailto:' + meta.email, title: meta.email },
-            svg('mail', 13, 2), 'Support') : null,
+            svg('mail', 13, 2), t('dev.support')) : null,
           meta.profileUrl ? el('a', { className: 'ab-btn li', href: meta.profileUrl, target: '_blank', rel: 'noopener noreferrer',
-            attrs: { 'aria-label': DEVELOPER + ' on LinkedIn' } }, svg('linkedin', 13), 'LinkedIn') : null));
+            attrs: { 'aria-label': t('dev.linkedin', { name: DEVELOPER }) } }, svg('linkedin', 13), 'LinkedIn') : null));
+    }
+
+    // Language picker: "Automatic" follows the browser; main.js stores the choice.
+    function langRow() {
+      const { LANGS, browserLang, choice } = root.CPF.i18n;
+      const sel = el('select', { attrs: { 'aria-label': t('about.lang') } },
+        el('option', { value: 'auto', textContent: t('about.langAuto', { name: LANGS[browserLang()] }) }),
+        Object.entries(LANGS).map(([code, name]) => el('option', { value: code, textContent: name })));
+      sel.value = choice();
+      sel.onchange = () => {
+        setLang(sel.value); onLang(sel.value);
+        const again = shadow.querySelector('.ab-lang select');
+        if (again) again.focus();
+      };
+      return el('label', { className: 'ab-lang' }, el('span', {}, svg('globe', 13, 2), t('about.lang')), sel);
     }
 
     function aboutPane() {
       // One line per feature so all six fit the 468px body; full text on hover.
-      const feature = ([iconName, tone, title, desc]) =>
-        el('div', { className: 'ab-card', attrs: { title: desc } },
+      const feature = ([iconName, tone, key]) =>
+        el('div', { className: 'ab-card', attrs: { title: t(key + '.d') } },
           el('span', { className: 'ab-ic ' + tone }, svg(iconName, 12, 2.1)),
-          el('b', { textContent: title }));
+          el('b', { textContent: t(key) }));
 
       return el('div', { className: 'about', id: 'cpn-info', attrs: { role: 'tabpanel' } },
         // Name and icon are already in the header, so the hero leads with the tagline.
         el('div', { className: 'ab-hero' },
           el('div', { className: 'ab-hero-top' },
             el('div', { className: 'ab-hero-txt' },
-              el('h2', {}, 'Search. Navigate. Open. ', el('span', { textContent: 'Instantly.' })),
+              el('h2', {}, t('about.title'), el('span', { textContent: t('about.titleAccent') })),
               el('span', { className: 'ab-ver', textContent: 'v' + meta.version })),
             el('div', { className: 'ab-art' }, rawSvg(HERO_ART))),
-          el('p', { className: 'ab-desc', textContent: ABOUT_TEXT })),
+          el('p', { className: 'ab-desc', textContent: t('about.text') })),
 
-        el('div', { className: 'ab-sec' }, el('h3', { textContent: 'Key Features' }),
-          el('em', { textContent: 'Save time and navigate faster' })),
+        el('div', { className: 'ab-sec' }, el('h3', { textContent: t('about.features') }),
+          el('em', { textContent: t('about.featuresSub') })),
         el('div', { className: 'ab-grid' }, FEATURES.map(feature)),
 
         el('div', { className: 'ab-ro' },
           el('span', { className: 'ab-ro-ic' }, svg('lock', 15, 2)),
-          el('div', {}, el('b', { textContent: 'Read-only' }),
-            el('span', { textContent: 'Uses your Marketing Cloud session. No data is modified, collected or sent anywhere.' }))),
+          el('div', {}, el('b', { textContent: t('about.ro') }),
+            el('span', { textContent: t('about.roText') }))),
+
+        langRow(),
 
         // Required by store policy: state that this isn't a Salesforce product.
-        el('p', { className: 'ab-legal', textContent: 'Independent tool, not affiliated with or endorsed by Salesforce. ' +
-          'Salesforce and Marketing Cloud are trademarks of Salesforce, Inc.' }));
+        el('p', { className: 'ab-legal', textContent: t('about.legal') }));
     }
 
     function keysPane() {
@@ -1261,14 +1318,24 @@
       const row = (label, keys) => el('li', {}, el('div', { textContent: label }), keys);
       return el('div', { className: 'info', id: 'cpn-info', attrs: { role: 'tabpanel' } },
         el('ul', { className: 'keys' },
-          row('Open extension & focus search', k(MOD, 'K')),
-          row('Move through results', k('↑', '↓')),
-          row('Open selected page', k('Enter')),
-          row('Back · clear search · close', k('Esc'))),
-        el('p', { className: 'muted', textContent: `${MOD}+K works anywhere in Marketing Cloud.` }));
+          row(t('keys.open'), k(MOD, 'K')),
+          row(t('keys.move'), k('↑', '↓')),
+          row(t('keys.openSel'), k(t('key.enter'))),
+          row(t('keys.esc'), k(t('key.esc')))),
+        el('p', { className: 'muted', textContent: t('keys.note', { mod: MOD }) }));
     }
 
-    return { render: renderList, query: () => input.value, setPositions, setTheme, toggle: () => toggle(panel.hidden) };
+    // Applies a language choice ('auto' or a code) and redraws whatever is on screen.
+    function setLang(choice) {
+      root.CPF.i18n.setLang(choice);
+      relabel();
+      if (whoOpen()) renderWho();
+      if (view === 'list') { if (lastState) renderList(lastState, true); }
+      else if (view === 'detail' && detailItem) renderDetail(detailItem);
+      else if (view === 'info' && redrawInfo) redrawInfo();
+    }
+
+    return { render: renderList, query: () => input.value, setPositions, setTheme, setLang, toggle: () => toggle(panel.hidden) };
   }
 
   (root.CPF = root.CPF || {}).ui = { mount };

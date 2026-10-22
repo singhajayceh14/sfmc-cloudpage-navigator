@@ -37,6 +37,7 @@ Using the browser's local extension storage (`chrome.storage.local`), on your de
 - the vertical position of the panel and its launcher tab
 - the list of CloudPages you pinned (stored as an internal type and ID, such as `landingpage:12345`)
 - your colour theme choice (light, dark or system)
+- your language choice, if you picked one instead of following the browser
 
 You can remove this data at any time by uninstalling the extension.
 

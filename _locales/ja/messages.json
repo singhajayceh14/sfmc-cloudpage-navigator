@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "Salesforce Marketing Cloud (SFMC) の CloudPages を名前、URL、URL キー、フォルダーで検索し、ワンクリックで開けます。読み取り専用。",
+    "description": "Store summary and manifest description, max 132 characters."
+  },
+  "actionTitle": {
+    "message": "CloudPage Navigator（Marketing Cloud で Ctrl+K）",
+    "description": "Toolbar button tooltip."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "CloudPages in Salesforce Marketing Cloud (SFMC) nach Name, URL, Schlüssel oder Ordner suchen und per Klick öffnen. Nur lesend.",
+    "description": "Store summary and manifest description, max 132 characters."
+  },
+  "actionTitle": {
+    "message": "CloudPage Navigator (Ctrl+K in Marketing Cloud)",
+    "description": "Toolbar button tooltip."
+  }
+}

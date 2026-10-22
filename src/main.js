@@ -6,6 +6,7 @@
   const POSITION_KEY = 'cpn.position';   // { panel, fab } vertical offsets chosen by dragging
   const PINS_KEY = 'cpn.pins';           // array of core.keyOf() strings, newest pin last
   const THEME_KEY = 'cpn.theme';         // 'light' | 'dark' | 'system'
+  const LANG_KEY = 'cpn.lang';           // 'auto' or a language code from i18n.js
   // Without chrome.storage the UI still works, just without persistence.
   const store = {
     area: root.chrome && chrome.storage && chrome.storage.local,
@@ -52,6 +53,7 @@
     cloudPageUrl: it => core.editorLink(location.origin, it),
     onMove: position => store.set(POSITION_KEY, position),
     onTheme: theme => store.set(THEME_KEY, theme),
+    onLang: lang => store.set(LANG_KEY, lang),
     // Read once per session; the header popover asks for it the first time it is opened.
     onIdentity: () => api.getIdentity(),
   });
@@ -65,6 +67,7 @@
 
   store.get(POSITION_KEY).then(p => p && view.setPositions(p));
   store.get(THEME_KEY).then(t => t && view.setTheme(t));
+  store.get(LANG_KEY).then(l => l && l !== 'auto' && view.setLang(l));
   store.get(PINS_KEY).then(keys => { if (Array.isArray(keys) && keys.length) { st.pinned = new Set(keys); paint(); } });
 
   // NOTE: the only place we change host page behaviour (navigation only, never data).

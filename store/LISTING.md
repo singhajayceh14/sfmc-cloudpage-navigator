@@ -63,7 +63,8 @@ HOW TO USE
 This is an independent tool. It is not affiliated with, endorsed by or sponsored by Salesforce, Inc. Salesforce and Marketing Cloud are trademarks of Salesforce, Inc.
 ```
 
-**Category:** Developer Tools (or *Workflow & Planning*) · **Language:** English
+**Category:** Developer Tools (or *Workflow & Planning*) · **Language:** English. French, German, Spanish and
+Japanese listings are in [LISTING-i18n.md](LISTING-i18n.md).
 
 **Graphics:**
 | Asset | Required | File |
@@ -96,7 +97,7 @@ The store allows at most 5 screenshots.
 > Lets Salesforce Marketing Cloud users search their CloudPages (landing pages, code resources, microsites) by name, URL, URL key or folder and open them directly.
 
 **Permission justification: `storage`:**
-> Saves the user's preferences locally on the device: the vertical position of the panel, the list of CloudPages the user pinned as favourites, and the chosen colour theme. Nothing is synced or sent anywhere.
+> Saves the user's preferences locally on the device: the vertical position of the panel, the list of CloudPages the user pinned as favourites, the chosen colour theme and the chosen language. Nothing is synced or sent anywhere.
 
 **Host permission justification (content script on `https://*.exacttarget.com/cloud/*`):**
 > The extension's only purpose is to add a search panel inside Salesforce Marketing Cloud. The content script runs only on Marketing Cloud pages. It calls Marketing Cloud's own endpoints on the same site, using the user's existing session, to read the list of CloudPages and their folder names. The script is read-only and never modifies data.
